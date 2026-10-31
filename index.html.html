@@ -1,0 +1,808 @@
+<title>Relatório de Prática Profissional</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.iife.js"></script>
+<style>
+/* Layout: faixa institucional no topo, trilha de etapas à esquerda, formulário em coluna de leitura à direita. */
+:root{
+  --bg:#f5f7f4; --surface:#ffffff; --sunk:#eaeee8; --line:#d3dacf; --fg:#1d261d; --muted:#5b6858;
+  --brand:#2f8a3c; --brand-ink:#ffffff; --brand-soft:#e2f0e1; --red:#c0272d; --warn:#9a6400; --warn-soft:#fbf0d9; --ok:#2f8a3c;
+  --f-display:"Literata", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo-cor{display:none} :root:not([data-theme="light"]) .logo-branca{display:block}}
+:root[data-theme="dark"] .logo-cor{display:none} :root[data-theme="dark"] .logo-branca{display:block}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121712; --surface:#1a211a; --sunk:#222b22; --line:#334033; --fg:#e4ebe2; --muted:#9caa98;
+  --brand:#5cbf69; --brand-ink:#0d150d; --brand-soft:#1f3321; --red:#ef6b6f; --warn:#e6b45a; --warn-soft:#33290f; --ok:#5cbf69; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121712; --surface:#1a211a; --sunk:#222b22; --line:#334033; --fg:#e4ebe2; --muted:#9caa98;
+  --brand:#5cbf69; --brand-ink:#0d150d; --brand-soft:#1f3321; --red:#ef6b6f; --warn:#e6b45a; --warn-soft:#33290f; --ok:#5cbf69; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .in{max-width:1180px;margin:0 auto;padding-block:12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.brandline{display:flex;gap:12px;align-items:center;min-width:0}
+.logo{height:56px;width:auto;flex:none}
+.logo-branca{display:none}
+.brandline > div{border-left:1px solid var(--line);padding-left:12px}
+.brandline h1{font-family:var(--f-display);font-weight:650;font-size:1.15rem;margin:0;line-height:1.2;text-wrap:balance}
+.brandline p{margin:0;color:var(--muted);font-size:.82rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;cursor:pointer;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:8px 14px;font-size:.92rem}
+button:hover{border-color:var(--brand)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 55%,transparent);outline-offset:1px}
+button.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:700}
+button.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+button.ghost:hover{color:var(--fg)}
+button.danger{color:var(--red)}
+.layout{max-width:1180px;margin:0 auto;padding-block:24px 64px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:32px;align-items:start}
+nav.steps{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px)}
+nav.steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+nav.steps button{width:100%;text-align:left;border:0;background:transparent;display:grid;grid-template-columns:28px 1fr 12px;gap:8px;align-items:center;padding:7px 8px;border-radius:var(--r)}
+nav.steps button .n{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+nav.steps button .s{font-size:.82rem;color:var(--muted);display:block;line-height:1.2}
+nav.steps button[aria-current="step"]{background:var(--brand-soft)}
+nav.steps button[aria-current="step"] .t{font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line)}
+.dot.partial{border-color:var(--warn);background:linear-gradient(90deg,var(--warn) 50%,transparent 50%)}
+.dot.done{border-color:var(--ok);background:var(--ok)}
+.dot.na{border-style:dashed}
+main{min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin:0 0 4px}
+main h2{font-family:var(--f-display);font-weight:650;font-size:1.7rem;line-height:1.2;margin:0 0 8px;text-wrap:balance}
+.lead{color:var(--muted);max-width:68ch;margin:0 0 24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:18px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font-weight:700;font-size:.95rem}
+.field label .req{color:var(--red);font-weight:400}
+.help{color:var(--muted);font-size:.86rem;margin:0;max-width:72ch}
+input,textarea,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;width:100%}
+textarea{resize:vertical;min-height:110px;line-height:1.55}
+input::placeholder,textarea::placeholder{color:color-mix(in srgb,var(--muted) 75%,transparent)}
+.counter{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);align-self:flex-end;font-variant-numeric:tabular-nums}
+.counter.bad{color:var(--warn)} .counter.good{color:var(--ok)}
+h3.sub{font-family:var(--f-display);font-weight:650;font-size:1.15rem;margin:0;display:flex;gap:10px;align-items:baseline}
+h3.sub .num{font-family:var(--f-mono);font-size:.85rem;color:var(--brand);font-weight:500}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.mod{position:relative;display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);cursor:pointer}
+.mod input{width:18px;height:18px;margin-top:3px;flex:none;accent-color:var(--brand)}
+.mod b{display:block}
+.mod small{color:var(--muted);display:block;font-size:.84rem;line-height:1.35;margin-top:2px}
+.mod .tag{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.mod:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table.ed{border-collapse:collapse;width:100%;min-width:560px}
+table.ed th{font-size:.8rem;text-align:left;color:var(--muted);font-weight:700;padding:8px;background:var(--sunk);border-bottom:1px solid var(--line)}
+table.ed td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.ed tr:last-child td{border-bottom:0}
+table.ed input,table.ed select,table.ed textarea{padding:6px 8px;font-size:.92rem}
+table.ed textarea{min-height:44px}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap}
+.xbtn{padding:4px 9px;color:var(--muted)}
+.note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;border-radius:var(--r);font-size:.9rem}
+.note.info{background:var(--brand-soft);border-left-color:var(--brand)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.desc-item{border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.desc-head{display:flex;gap:10px;align-items:center}
+.desc-head .num{font-family:var(--f-mono);font-size:.85rem;color:var(--brand);flex:none}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:start;font-size:.95rem}
+.checks li::before{content:"";width:12px;height:12px;border-radius:50%;margin-top:5px;background:var(--ok)}
+.checks li.warn::before{background:var(--warn)}
+.checks li.miss::before{background:transparent;border:2px solid var(--red)}
+.outline{font-family:var(--f-display);font-size:.95rem;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+.outline li{display:grid;grid-template-columns:4.2em 1fr;gap:6px;align-items:baseline}
+.outline .num{font-family:var(--f-mono);font-size:.82rem;color:var(--muted)}
+.outline .l1{font-weight:650;text-transform:uppercase;font-size:.88rem;padding-top:6px}
+.outline .l2{text-transform:uppercase;font-size:.84rem}
+.outline .l3{font-size:.9rem}
+.confirm{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r);padding:10px 14px;margin-bottom:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-size:.92rem;max-width:calc(100% - 32px);z-index:20}
+.saved{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+@media (max-width:860px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px;padding-top:12px}
+  nav.steps{position:static;overflow-x:auto;margin-inline:-4px}
+  nav.steps ol{flex-direction:row;gap:4px;padding:4px}
+  nav.steps button{grid-template-columns:auto auto;white-space:nowrap;padding:6px 10px;border:1px solid var(--line)}
+  nav.steps button .s{display:none}
+  nav.steps button .dot{display:none}
+  main h2{font-size:1.4rem}
+  header.top{position:static}
+  .logo{height:46px}
+  .saved{display:none}
+  .actions button{padding:7px 10px;font-size:.86rem}
+}
+@media (prefers-reduced-motion:no-preference){button,.mod{transition:border-color .15s,background-color .15s}}
+</style>
+
+<header class="top wrap">
+  <div class="in">
+    <div class="brandline">
+      <img class="logo logo-cor" alt="Instituto Federal do Rio Grande do Norte" src="data:image/png;base64,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"><img class="logo logo-branca" alt="Instituto Federal do Rio Grande do Norte" src="data:image/png;base64,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">
+      <div><h1>Relatório de Prática Profissional</h1><p>IFRN · Cursos Técnicos Integrados · Resolução nº 25/2019-CONSUP</p></div>
+    </div>
+    <div class="actions">
+      <span class="saved" id="savedState"></span>
+      <button id="btnOpen" type="button">Abrir rascunho</button>
+      <button id="btnSave" type="button">Salvar rascunho</button>
+      <button id="btnDocx" type="button" class="primary">Gerar relatório (.docx)</button>
+      <input type="file" id="fileOpen" accept=".json,application/json" hidden>
+    </div>
+  </div>
+</header>
+
+<div class="layout wrap">
+  <nav class="steps" aria-label="Etapas"><ol id="nav"></ol></nav>
+  <main id="main" tabindex="-1"></main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+'use strict';
+/* ====================== CONTEÚDO NORMATIVO ====================== */
+const MODS = {
+  A:{nome:'Estágio', inciso:'art. 3º, I', ex:'Estágio obrigatório ou não obrigatório em empresa ou instituição concedente.',
+     sup:'Supervisor(a) do estágio', principal:'concedente',
+     campos:[{k:'tipo',l:'Tipo de estágio',type:'select',opts:['Não obrigatório','Obrigatório'],req:1},{k:'concedente',l:'Unidade concedente',ph:'Razão social, cidade/UF',req:1},{k:'supervisor',l:'Supervisor(a) na concedente',ph:'Nome, cargo ou formação',req:1},{k:'registro',l:'Termo de Compromisso / registro no SUAP',ph:'Nº do Termo de Compromisso'}],
+     secoes:[
+      ['Identificação da unidade concedente','Razão social, nome fantasia, CNPJ, endereço, ramo de atividade e porte. Informe se o estágio é obrigatório ou não obrigatório, conforme o PPC.'],
+      ['Histórico e área de atuação','Histórico resumido, produtos ou serviços, público atendido e relação da área de atuação com o seu curso.'],
+      ['Estrutura organizacional e setor do estágio','Estrutura da empresa, setor em que você atuou, equipe, equipamentos e normas de segurança. O organograma pode ser inserido depois no Word como figura.'],
+      ['Supervisão do estágio','Nome, formação e cargo do(a) supervisor(a) e como funcionou o acompanhamento no dia a dia.']],
+     res:'melhorias propostas ou implementadas, serviços executados, documentos técnicos elaborados',
+     docs:'Termo de Compromisso de Estágio; ficha de frequência; ficha de avaliação do(a) supervisor(a)'},
+  B:{nome:'Programa de aprendizagem', inciso:'art. 3º, II', ex:'Contrato de jovem aprendiz vinculado ao eixo tecnológico do curso.',
+     sup:'Empregado(a) monitor(a)', principal:'empresa',
+     campos:[{k:'empresa',l:'Empresa contratante',ph:'Razão social, cidade/UF',req:1},{k:'entidade',l:'Programa / entidade formadora',ph:'Nome do programa de aprendizagem'},{k:'monitor',l:'Empregado(a) monitor(a)',ph:'Nome, cargo',req:1},{k:'registro',l:'Contrato de aprendizagem / registro no SUAP',ph:'Nº ou data do contrato'}],
+     secoes:[
+      ['Identificação da empresa contratante','Razão social, CNPJ, endereço, ramo de atividade e porte.'],
+      ['Caracterização do programa de aprendizagem','Nome do programa, entidade formadora, período do contrato, jornada, distribuição entre teoria e prática e relação com o eixo tecnológico do curso.'],
+      ['Setor de atuação e acompanhamento','Setor em que você atuou e acompanhamento pelo(a) empregado(a) monitor(a): nome, cargo e forma de acompanhamento.']],
+     res:'atividades executadas no setor, rotinas e procedimentos aprendidos, contribuições à empresa',
+     docs:'Contrato de aprendizagem; declaração e avaliação do(a) empregado(a) monitor(a)'},
+  C:{nome:'Atividade profissional efetiva', inciso:'art. 3º, III', ex:'Emprego, cargo ou função, atividade autônoma, trainee, bolsa de iniciação profissional, estágio ou aprendizagem por outra instituição.',
+     sup:'Chefia imediata / responsável', principal:'organizacao',
+     campos:[{k:'tipo',l:'Tipo de vínculo',type:'select',req:1,opts:['Emprego privado','Emprego público','Cargo ou função','Atividade profissional autônoma','Programa de trainee','Programa de bolsas de iniciação profissional','Estágio por meio de outra instituição de ensino','Aprendizagem por meio de outra instituição de ensino']},{k:'organizacao',l:'Organização / empregador',ph:'Se autônomo(a), a sua área de atuação',req:1},{k:'cargo',l:'Cargo ou função',req:1},{k:'responsavel',l:'Chefia imediata ou responsável',ph:'Se houver'}],
+     secoes:[
+      ['Natureza do vínculo','Tipo de vínculo (emprego público ou privado; cargo ou função; atividade autônoma; programa de trainee; programa de bolsas de iniciação profissional; ou estágio ou aprendizagem por meio de outra instituição de ensino — art. 19), data de início e jornada.'],
+      ['Caracterização da organização ou da atividade autônoma','Organização em que você trabalha (ramo, porte, área). Se autônomo(a): serviços oferecidos, clientes e forma de atuação.'],
+      ['Cargo ou função e relação com o perfil profissional','Atribuições do cargo ou função e relação com o perfil profissional de conclusão do curso.']],
+     res:'serviços executados, problemas técnicos resolvidos, melhorias propostas',
+     docs:'Comprovação de vínculo (CTPS digital, contrato, termo de posse ou declaração do empregador); declaração de atividades e carga horária'},
+  D:{nome:'Empreendedorismo', inciso:'art. 3º, IV', ex:'MEI, empresa júnior, miniempresa, empresa incubada ou hotel de projeto.',
+     sup:'Responsável (incubadora / empresa júnior)', principal:'empreendimento',
+     campos:[{k:'tipo',l:'Tipo de empreendimento',type:'select',req:1,opts:['Microempreendedor(a) individual (MEI)','Empresa júnior','Miniempresa','Empresa incubada','Hotel de projeto']},{k:'empreendimento',l:'Nome do empreendimento',req:1},{k:'cnpj',l:'CNPJ / nº do CCMEI',ph:'Se houver'},{k:'entidade',l:'Incubadora, empresa júnior ou entidade responsável',ph:'Se houver'},{k:'funcao',l:'Sua função no empreendimento'}],
+     secoes:[
+      ['Tipo de empreendimento','MEI (Lei Complementar nº 128/2008), empresa júnior, miniempresa, empresa incubada ou hotel de projeto. CNPJ ou nº do CCMEI, entidade responsável e data de início.'],
+      ['Caracterização do empreendimento','Produtos ou serviços, público-alvo, mercado e concorrência, proposta de valor.'],
+      ['Modelo de negócio e gestão','Organização do empreendimento: estrutura, finanças, marketing, fornecedores e aspectos legais.'],
+      ['Papel do(a) estudante no empreendimento','Sua função e suas responsabilidades.']],
+     res:'indicadores do empreendimento (clientes, faturamento, produtos lançados), ações de gestão e lições aprendidas',
+     docs:'CCMEI ou cartão CNPJ; declaração da incubadora, empresa júnior, miniempresa ou hotel de projeto'},
+  E:{nome:'Projeto integrador, de pesquisa, extensão ou ensino', inciso:'art. 3º, V-a', ex:'Prática como componente curricular por meio de projeto.',
+     sup:'Coordenador(a) do projeto', principal:'titulo',
+     campos:[{k:'tipo',l:'Tipo de projeto',type:'select',req:1,opts:['Projeto integrador','Projeto de ensino','Projeto de pesquisa','Projeto de extensão']},{k:'titulo',l:'Título do projeto',req:1},{k:'suap',l:'Nº do projeto no SUAP',ph:'Ex.: 1072',help:'O número que aparece no endereço do projeto no SUAP. Se for projeto integrador sem registro, deixe em branco.'},{k:'edital',l:'Edital',ph:'Ex.: Edital nº 01/2026-PROEX',help:'Se houver.'},{k:'coordenador',l:'Coordenador(a) do projeto',req:1},{k:'condicao',l:'Sua participação',type:'select',opts:['Bolsista','Voluntário(a)','Integrante da equipe (projeto integrador)']},{k:'link',l:'Link do projeto no SUAP',ph:'https://suap.ifrn.edu.br/…',help:'Opcional. O link exige login, por isso o número e o título são a identificação principal.'}],
+     secoes:[
+      ['Identificação do projeto','Tipo (integrador, de pesquisa, de extensão ou de ensino), título, edital (se houver), registro no SUAP, coordenador(a) e período. Se o projeto foi feito em equipe, deixe claro qual foi a sua parte. O projeto deve ter relação com as disciplinas do núcleo tecnológico (art. 27).'],
+      ['Problema e justificativa','Situação-problema ou demanda da comunidade e relevância do projeto.'],
+      ['Objetivos','Objetivo geral e objetivos específicos.'],
+      ['Fundamentação teórica','Conceitos e autores que fundamentam o projeto, com citações conforme a ABNT NBR 10520.'],
+      ['Metodologia','Tipo de estudo ou intervenção, etapas, materiais, instrumentos e procedimentos de coleta e análise.']],
+     res:'resultados e discussão em relação aos objetivos e ao referencial teórico; produtos gerados (protótipo, material, evento, publicação)',
+     docs:'Comprovante de registro do projeto no SUAP; declaração do(a) coordenador(a) do projeto'},
+  F:{nome:'TAL ou Programa de Apoio à Formação Estudantil', inciso:'art. 3º, VI', ex:'Tutoria de Aprendizagem e Laboratório, monitoria ou apoio em laboratório.',
+     sup:'Docente responsável', principal:'disciplina',
+     campos:[{k:'programa',l:'Programa e edital',ph:'Ex.: TAL – Edital nº 00/2026',req:1},{k:'condicao',l:'Sua participação',type:'select',opts:['Bolsista','Voluntário(a)']},{k:'disciplina',l:'Disciplina, laboratório ou setor atendido',req:1},{k:'docente',l:'Docente responsável',req:1}],
+     secoes:[
+      ['Identificação do programa','Programa, edital ou processo seletivo, condição (bolsista ou voluntário(a)), período e carga horária semanal.'],
+      ['Disciplina, laboratório ou setor atendido','Disciplina ou laboratório, docente responsável e recursos disponíveis.'],
+      ['Público atendido','Estudantes atendidos (turmas, quantidade, principais dificuldades) e horários de atendimento.']],
+     res:'número de atendimentos, materiais didáticos elaborados, evolução observada nos estudantes atendidos',
+     docs:'Termo de compromisso ou resultado do processo seletivo; declaração do(a) docente responsável; frequência'},
+  G:{nome:'Serviço voluntário', inciso:'art. 3º, X', ex:'Entidade pública ou instituição privada sem fins lucrativos (Lei nº 9.608/1998).',
+     sup:'Responsável na entidade', principal:'entidade',
+     campos:[{k:'entidade',l:'Entidade',ph:'Nome, cidade/UF',req:1},{k:'cnpj',l:'CNPJ da entidade'},{k:'responsavel',l:'Responsável pelo acompanhamento na entidade',ph:'Nome, função',req:1},{k:'adesao',l:'Data do Termo de Adesão',type:'date'}],
+     secoes:[
+      ['Identificação da entidade','Nome, CNPJ, endereço e finalidades (cívicas, culturais, educacionais, recreativas ou de assistência à pessoa). Data do Termo de Adesão.'],
+      ['Área de atuação e público atendido','Projetos ou ações da entidade em que você atuou e público beneficiado.'],
+      ['Responsável pelo acompanhamento na entidade','Nome e função de quem acompanhou as suas atividades.']],
+     res:'ações realizadas, número de pessoas beneficiadas e contribuição para a comunidade',
+     docs:'Termo de Adesão ao Serviço Voluntário; declaração da entidade com atividades e carga horária'},
+};
+const KEYS = Object.keys(MODS);
+
+/* ====================== ESTADO ====================== */
+const blankState = () => ({
+  v:1,
+  ident:{estudante:'',matricula:'',campus:'',curso:'',anoCurso:'',cidade:'',ano:String(new Date().getFullYear()),
+         titulo:'',subtitulo:'',area:'',orientador:'',mesmoOrientador:'Sim',inicio:'',fim:'',ch:'',jornada:''},
+  mods:Object.fromEntries(KEYS.map(k=>[k,{on:false,inicio:'',fim:'',ch:'',orientador:'',...Object.fromEntries(MODS[k].campos.map(c=>[c.k, c.type==='select'?c.opts[0]:''])), ...(k==='E'?{equipe:[{nome:'',matricula:'',funcao:''}]}:{})}])),
+  carac:Object.fromEntries(KEYS.map(k=>[k,MODS[k].secoes.map(()=> '')])),
+  introducao:'',
+  plano:[{atividade:'',situacao:'Realizada',ch:'',obs:''}],
+  descricao:[{titulo:'',texto:''}],
+  resultados:'',
+  teoria:[{disciplina:'',aplicacao:''}],
+  teoriaTexto:'',
+  aprendizagens:'',dificuldades:'',etica:'',
+  consideracoes:'',
+  agradecimentos:'',resumo:'',palavras:'',
+  siglas:[{sigla:'IFRN',sig:'Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte'},{sigla:'PPC',sig:'Projeto Pedagógico de Curso'},{sigla:'SUAP',sig:'Sistema Unificado de Administração Pública'}],
+  referencias:'INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO RIO GRANDE DO NORTE. Conselho Superior. Resolução nº 25/2019-CONSUP, de 19 de junho de 2019. Aprova a atualização da Regulamentação da Prática Profissional Discente no âmbito do IFRN. Natal: IFRN, 2019.',
+});
+let S = blankState();
+const LSKEY = 'ifrn-pp-rascunho-v1';
+
+function merge(base, data){ // mescla rascunho carregado sobre o modelo vazio
+  if(Array.isArray(base)) return Array.isArray(data)? data : base;
+  if(base && typeof base==='object'){ const o={...base}; if(data && typeof data==='object') for(const k in data){ o[k]= k in base? merge(base[k],data[k]) : data[k]; } return o; }
+  return (data===undefined||data===null)? base : (typeof base==='string'? String(data) : data);
+}
+const getP=(p)=>p.split('.').reduce((o,k)=>o==null?o:o[k],S);
+const setP=(p,v)=>{const ks=p.split('.');let o=S;for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks[ks.length-1]]=v;};
+const filled=v=>typeof v==='string'? v.trim().length>0 : !!v;
+const sel=()=>KEYS.filter(k=>S.mods[k].on);
+const words=s=>(s.trim().match(/\S+/g)||[]).length;
+
+/* ====================== ARMAZENAMENTO LOCAL ====================== */
+let saveT=null;
+function scheduleSave(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(LSKEY, JSON.stringify(S)); $('#savedState').textContent='rascunho salvo neste navegador'; }catch(e){ $('#savedState').textContent=''; } },500); }
+function migrate(d){ // rascunhos da primeira versão tinham local/supervisor/registro na identificação
+  if(d&&d.ident&&d.mods){ const I=d.ident; const A=d.mods.A||{}, B=d.mods.B||{};
+    if(A.on){ A.concedente=A.concedente||I.local||A.local||''; A.supervisor=A.supervisor||I.supervisor||''; A.registro=A.registro||I.registro||''; }
+    if(B.on){ B.empresa=B.empresa||I.local||B.local||''; B.monitor=B.monitor||I.supervisor||''; B.registro=B.registro||I.registro||''; }
+    delete I.local; delete I.supervisor; delete I.registro; }
+  return d; }
+function loadLocal(){ try{ const raw=localStorage.getItem(LSKEY); if(raw){ S=merge(blankState(), migrate(JSON.parse(raw))); return true; } }catch(e){} return false; }
+
+/* ====================== UTILITÁRIOS DOM ====================== */
+const $=s=>document.querySelector(s);
+function h(tag, attrs={}, ...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs||{})){
+    if(v==null||v===false) continue;
+    if(k==='class') e.className=v; else if(k==='text') e.textContent=v;
+    else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else e.setAttribute(k, v===true?'':v);
+  }
+  for(const c of kids.flat()){ if(c==null||c===false) continue; e.append(c.nodeType? c : document.createTextNode(String(c))); }
+  return e;
+}
+let uid=0;
+function bind(input, path, onChange){
+  input.value=getP(path)??'';
+  input.addEventListener('input',()=>{ setP(path, input.value); scheduleSave(); refreshNav(); onChange&&onChange(input.value); });
+  return input;
+}
+function field({label, path, type='text', help, ph, rows, req, options, count, min, max}){
+  const id='f'+(++uid);
+  let inp;
+  if(type==='textarea') inp=h('textarea',{id,rows:rows||5,placeholder:ph});
+  else if(type==='select') inp=h('select',{id}, (options||[]).map(o=>h('option',{value:o,text:o})));
+  else inp=h('input',{id,type,placeholder:ph,min,max,inputmode:type==='number'?'numeric':null});
+  const counter = count? h('span',{class:'counter'}) : null;
+  const upd = v=>{ if(!counter) return; const n=words(v); counter.textContent=`${n} palavras${count.min?` · ideal ${count.min}–${count.max}`:''}`; counter.className='counter'+(count.min? (n>=count.min&&n<=count.max?' good':(n?' bad':'')):''); };
+  bind(inp,path,upd); upd(inp.value);
+  return h('div',{class:'field'},
+    h('label',{for:id}, label, req? h('span',{class:'req',text:' *'}):null),
+    help? h('p',{class:'help',text:help}):null, inp, counter);
+}
+function rowsEditor(path, cols, blank){
+  const arr=getP(path);
+  const tb=h('tbody');
+  arr.forEach((row,i)=>{
+    tb.append(h('tr',{}, cols.map(c=>{
+      let inp;
+      if(c.type==='select') inp=h('select',{'aria-label':c.label}, c.options.map(o=>h('option',{value:o,text:o})));
+      else if(c.type==='textarea') inp=h('textarea',{'aria-label':c.label,rows:2,placeholder:c.ph||''});
+      else inp=h('input',{'aria-label':c.label,type:c.type||'text',placeholder:c.ph||'',inputmode:c.type==='number'?'numeric':null});
+      bind(inp, `${path}.${i}.${c.key}`);
+      return h('td',{style:c.w?`width:${c.w}`:null}, inp);
+    }), h('td',{style:'width:44px'}, h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover linha',title:'Remover linha',onclick:()=>{ arr.splice(i,1); if(!arr.length) arr.push(blank()); scheduleSave(); render(); }},'✕'))));
+  });
+  return h('div',{class:'stack',style:'gap:10px'},
+    h('div',{class:'tablewrap'}, h('table',{class:'ed'}, h('thead',{}, h('tr',{}, cols.map(c=>h('th',{text:c.label})), h('th',{}))), tb)),
+    h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ arr.push(blank()); scheduleSave(); render(); }},'+ Adicionar linha')));
+}
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,3800); }
+
+/* ====================== TÍTULO SUGERIDO ====================== */
+const cap1=s=>s? s.charAt(0).toLocaleUpperCase('pt-BR')+s.slice(1) : s;
+const antesVirg=s=>(s||'').split(',')[0].trim();
+function sugestao(){
+  const ks=sel(); const k=ks[0]; const m=k?S.mods[k]:{}; const A=(S.ident.area||'').trim();
+  const f=(v,lab)=>filled(v)? v.trim() : `[${lab}]`; const area=f(A,'área');
+  let titulo='', subtitulo='';
+  if(ks.length>1){
+    const parte=k=>{ const m=S.mods[k]; switch(k){
+      case 'A': return `estágio na ${f(antesVirg(m.concedente),'concedente')}`;
+      case 'B': return `aprendizagem na ${f(antesVirg(m.empresa),'empresa')}`;
+      case 'C': return m.tipo==='Atividade profissional autônoma'? 'atuação autônoma' : `atuação como ${f(m.cargo,'cargo').toLocaleLowerCase('pt-BR')} na ${f(antesVirg(m.organizacao),'organização')}`;
+      case 'D': return `empreendimento ${f(m.empreendimento,'nome')}`;
+      case 'E': return `${(m.tipo||'projeto').toLocaleLowerCase('pt-BR')} “${f(m.titulo,'título do projeto')}”`;
+      case 'F': return `tutoria em ${f(m.disciplina,'disciplina')}`;
+      case 'G': return `serviço voluntário na ${f(antesVirg(m.entidade),'entidade')}`; } };
+    const ps=ks.map(parte);
+    return {titulo:cap1(f(A,'área comum')), subtitulo: ps.slice(0,-1).join(', ')+' e '+ps[ps.length-1]};
+  }
+  switch(k){
+    case 'A': titulo=`Estágio em ${area} na ${f(antesVirg(m.concedente),'concedente')}`; break;
+    case 'B': titulo=`Aprendizagem em ${area} na ${f(antesVirg(m.empresa),'empresa')}`; break;
+    case 'C': titulo= m.tipo==='Atividade profissional autônoma'? `Atuação autônoma em ${area}` : `Atuação como ${f(m.cargo,'cargo')} na ${f(antesVirg(m.organizacao),'organização')}`; break;
+    case 'D': titulo=`${f(m.empreendimento,'empreendimento')}`; subtitulo=A? cap1(A) : '[principal atuação]'; break;
+    case 'E': titulo=`${f(m.titulo,'título do projeto')}`; subtitulo=A? cap1(A) : '[principal atuação]'; break;
+    case 'F': titulo=`Tutoria de aprendizagem em ${f(m.disciplina,'disciplina')}`; subtitulo=A? cap1(A) : ''; break;
+    case 'G': titulo=`Serviço voluntário na ${f(antesVirg(m.entidade),'entidade')}`; subtitulo=A? cap1(A) : ''; break;
+    default: titulo='[escolha a modalidade]';
+  }
+  return {titulo:cap1(titulo), subtitulo};
+}
+function updSug(){ const el=document.getElementById('sugTitulo'); if(!el) return; const sg=sugestao(); el.textContent=sg.titulo+(sg.subtitulo?': '+sg.subtitulo:''); }
+document.addEventListener('input',updSug); document.addEventListener('change',updSug);
+function nomeMod(k){ // nome usado no relatório (projetos detalham o tipo)
+  if(k==='E'){ const tp=S.mods.E.tipo||'Projeto'; return `Prática como componente curricular (${tp.toLowerCase()})`; }
+  return MODS[k].nome;
+}
+const multiOri=()=>sel().length>1 && S.ident.mesmoOrientador==='Não';
+function orientadores(){ // [{nome, mods:[k]}] únicos, na ordem das modalidades
+  const ks=sel(); if(!multiOri()) return [{nome:(S.ident.orientador||'').trim(), mods:ks}];
+  const out=[]; ks.forEach(k=>{ const n=((S.mods[k].orientador||'')||S.ident.orientador||'').trim(); const f=out.find(o=>o.nome===n); if(f) f.mods.push(k); else out.push({nome:n,mods:[k]}); });
+  return out;
+}
+function clearButton(){
+  return h('button',{type:'button',class:'ghost danger',onclick:(e)=>{
+    const host=e.target.closest('.note, .rowbtns'); if(host.nextElementSibling&&host.nextElementSibling.classList.contains('confirm')) return;
+    const box=h('div',{class:'confirm'}, h('span',{text:'Apagar tudo o que foi preenchido? Se quiser guardar, use "Salvar rascunho" antes.'}),
+      h('button',{type:'button',class:'primary',onclick:()=>{ S=blankState(); try{localStorage.removeItem(LSKEY);}catch(_){} $('#savedState').textContent=''; go(0); toast('Relatório limpo.'); }},'Apagar tudo'),
+      h('button',{type:'button',onclick:()=>box.remove()},'Cancelar'));
+    host.after(box); }},'Limpar relatório');
+}
+
+/* ====================== NUMERAÇÃO DO RELATÓRIO ====================== */
+function caracOutline(){ // [{num, titulo, nivel, key, idx}]
+  const ks=sel(), out=[];
+  if(ks.length<=1){ const k=ks[0]; if(k) MODS[k].secoes.forEach(([t],i)=>out.push({num:`3.${i+1}`,titulo:t,nivel:2,key:k,idx:i})); }
+  else ks.forEach((k,j)=>{ out.push({num:`3.${j+1}`,titulo:nomeMod(k),nivel:2,key:k,head:true}); MODS[k].secoes.forEach(([t],i)=>out.push({num:`3.${j+1}.${i+1}`,titulo:t,nivel:3,key:k,idx:i})); });
+  return out;
+}
+function outline(){
+  const o=[];
+  o.push(['', 'Pré-textuais: capa, folha de rosto, termo de validação'+(filled(S.agradecimentos)?', agradecimentos':'')+', resumo'+(S.siglas.some(r=>filled(r.sigla))?', lista de siglas':'')+', sumário',0]);
+  o.push(['1','Introdução',1]);
+  o.push(['2','Identificação da prática profissional',1]);
+  o.push(['3','Caracterização do contexto da prática profissional',1]);
+  caracOutline().forEach(x=>o.push([x.num,x.titulo,x.nivel]));
+  o.push(['4','Atividades desenvolvidas',1]); o.push(['4.1','Plano de atividades e execução',2]); o.push(['4.2','Descrição das atividades',2]);
+  S.descricao.forEach((d,i)=>o.push([`4.2.${i+1}`, d.titulo||'[Atividade ou tema]',3]));
+  o.push(['4.3','Resultados e produtos',2]);
+  o.push(['5','Relação entre teoria e prática',1]);
+  o.push(['6','Análise crítica da experiência',1]); o.push(['6.1','Aprendizagens e competências desenvolvidas',2]); o.push(['6.2','Dificuldades encontradas e soluções adotadas',2]); o.push(['6.3','Ética, segurança e relações de trabalho',2]);
+  o.push(['7','Considerações finais',1]);
+  o.push(['','Referências',1]); o.push(['','Anexo A – Plano de atividades deferido',1]); o.push(['','Anexo B – Documentos comprobatórios',1]);
+  return o;
+}
+
+/* ====================== ETAPAS ====================== */
+const identReq=['estudante','matricula','campus','curso','cidade','ano','orientador','inicio','fim','ch'];
+const STEPS=[
+  {t:'Identificação', s:'Capa, folha de rosto, Quadro 1', st:()=>ratio(identReq.map(k=>S.ident[k])), r:stepIdent},
+  {t:'Modalidades e título', s:'Dados da prática · Quadros 1 e 2', st:()=>{const k=sel(); if(!k.length) return 'empty'; return ratio([S.ident.titulo,...k.flatMap(x=>[...MODS[x].campos.filter(c=>c.req).map(c=>S.mods[x][c.k]), ...(k.length>1?[S.mods[x].ch,S.mods[x].inicio,S.mods[x].fim]:[])])]); }, r:stepMods},
+  {t:'Introdução', s:'Seção 1', st:()=>ratio([S.introducao]), r:stepIntro},
+  {t:'Caracterização', s:'Seção 3', st:()=>{const k=sel(); if(!k.length) return 'na'; return ratio(k.flatMap(x=>S.carac[x])); }, r:stepCarac},
+  {t:'Atividades', s:'Seção 4', st:()=>ratio([S.plano.some(r=>filled(r.atividade)), S.descricao.some(d=>filled(d.texto)), S.resultados]), r:stepAtiv},
+  {t:'Teoria e prática', s:'Seção 5', st:()=>ratio([S.teoria.some(r=>filled(r.disciplina)), S.teoriaTexto]), r:stepTeoria},
+  {t:'Análise crítica', s:'Seção 6', st:()=>ratio([S.aprendizagens,S.dificuldades,S.etica]), r:stepAnalise},
+  {t:'Considerações finais', s:'Seção 7', st:()=>ratio([S.consideracoes]), r:stepConsid},
+  {t:'Resumo e referências', s:'Pré e pós-textuais', st:()=>ratio([S.resumo,S.palavras,S.referencias]), r:stepResumo},
+  {t:'Revisar e gerar', s:'Conferência e .docx', st:()=>'na', r:stepRevisar},
+];
+function ratio(vals){ const n=vals.filter(filled).length; return n===0?'empty': n===vals.length?'done':'partial'; }
+let cur=0;
+function refreshNav(){
+  const ol=$('#nav'); if(!ol.children.length){
+    STEPS.forEach((s,i)=>ol.append(h('li',{}, h('button',{type:'button',onclick:()=>go(i)}, h('span',{class:'n',text:String(i+1).padStart(2,'0')}), h('span',{}, h('span',{class:'t',text:s.t}), h('span',{class:'s',text:s.s})), h('span',{class:'dot'})))));
+  }
+  [...ol.querySelectorAll('button')].forEach((b,i)=>{ b.toggleAttribute('aria-current',false); if(i===cur) b.setAttribute('aria-current','step'); const st=STEPS[i].st(); b.querySelector('.dot').className='dot '+(st==='empty'?'':st); b.title = st==='done'?'Completa':st==='partial'?'Incompleta':''; });
+}
+function go(i){ cur=i; render(); const m=$('#main'); m.focus({preventScroll:true}); window.scrollTo({top:0}); }
+function render(){
+  uid=0; const m=$('#main'); m.replaceChildren();
+  const s=STEPS[cur];
+  m.append(...[].concat(s.r()));
+  m.append(h('div',{class:'pager'},
+    cur>0? h('button',{type:'button',onclick:()=>go(cur-1)},'← '+STEPS[cur-1].t) : h('span'),
+    cur<STEPS.length-1? h('button',{type:'button',class:'primary',onclick:()=>go(cur+1)},STEPS[cur+1].t+' →') : h('span')));
+  refreshNav();
+}
+const head=(eyebrow,title,lead)=>[h('p',{class:'eyebrow',text:eyebrow}), h('h2',{text:title}), lead? h('p',{class:'lead',text:lead}):null];
+
+function stepIdent(){
+  let confirmBox=null;
+  return [...head('Etapa 1 · Elementos pré-textuais','Identificação','Estes dados preenchem automaticamente a capa, a folha de rosto, o termo de validação e o Quadro 1 do relatório. Você digita uma vez só.'),
+    h('div',{class:'note info',style:'margin-bottom:16px'}, 'Quer ver como funciona antes? ', h('button',{type:'button',onclick:(e)=>{ if(confirmBox) return; confirmBox=h('div',{class:'confirm'}, h('span',{text:'Isso substitui o que estiver preenchido por um exemplo fictício. Continuar?'}), h('button',{type:'button',class:'primary',onclick:()=>{ S=merge(blankState(),EXEMPLO); scheduleSave(); render(); toast('Exemplo carregado. Lembre-se de substituir pelos seus dados.'); }},'Carregar exemplo'), h('button',{type:'button',onclick:()=>{confirmBox.remove();confirmBox=null;}},'Cancelar')); e.target.closest('.note').after(confirmBox); }},'Carregar exemplo fictício'), ' ', clearButton()),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Estudante e curso'}),
+        h('div',{class:'grid2'},
+          field({label:'Nome completo',path:'ident.estudante',req:1,ph:'Como consta no SUAP'}),
+          field({label:'Matrícula',path:'ident.matricula',req:1}),
+          field({label:'Campus',path:'ident.campus',req:1,ph:'Ex.: Natal-Central'}),
+          field({label:'Curso',path:'ident.curso',req:1,ph:'Ex.: Edificações',help:'Só o nome. O texto "Técnico de Nível Médio em … na forma Integrada" é montado automaticamente.'}),
+          field({label:'Ano do curso em que realizou a prática',path:'ident.anoCurso',ph:'Ex.: 3º ano'}),
+          field({label:'Cidade',path:'ident.cidade',req:1}),
+          field({label:'Ano de entrega',path:'ident.ano',req:1,type:'number'}))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Orientação'}),
+        h('div',{class:'grid2'},
+          field({label:'Orientador(a)',path:'ident.orientador',req:1,ph:'Nome completo',help:'Docente do IFRN em exercício no seu campus (art. 5º). Na prática combinada com orientadores diferentes, este é o orientador da primeira atividade; os demais são informados na etapa Modalidades.'}))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Período e carga horária'}),
+        h('p',{class:'help',text:'Se a prática for combinada, informe o período e a carga horária totais. A divisão por modalidade é feita na próxima etapa.'}),
+        h('div',{class:'grid2'},
+          field({label:'Início',path:'ident.inicio',type:'date',req:1}),
+          field({label:'Término',path:'ident.fim',type:'date',req:1}),
+          field({label:'Carga horária total (h)',path:'ident.ch',type:'number',req:1,min:0,help:'Conforme a carga horária de prática profissional definida no PPC do seu curso.'}),
+          field({label:'Jornada semanal (h)',path:'ident.jornada',type:'number',min:0})))
+    )];
+}
+
+function stepMods(){
+  const list=h('div',{class:'mods'}, KEYS.map(k=>{
+    const cb=h('input',{type:'checkbox',id:'mod'+k});
+    cb.checked=S.mods[k].on;
+    cb.addEventListener('change',()=>{ S.mods[k].on=cb.checked; scheduleSave(); render(); });
+    return h('label',{class:'mod',for:'mod'+k}, cb, h('span',{}, h('span',{class:'tag',text:`Bloco ${k} · ${MODS[k].inciso}`}), h('b',{text:MODS[k].nome}), h('small',{text:MODS[k].ex})));
+  }));
+  const ks=sel(); const out=[...head('Etapa 2 · Art. 3º da Resolução 25/2019','Modalidades e título','Marque a modalidade da sua prática e preencha os dados dela. Se você combinou mais de uma (art. 3º, caput), marque todas: cada uma ganha os seus próprios dados, uma subseção de caracterização e uma linha no Quadro 2, com a carga horária de cada atividade.'), list];
+  if(ks.length){
+    out.push(h('div',{class:'stack',style:'margin-top:20px'}, ks.map(k=>h('div',{class:'card'},
+      h('h3',{class:'sub'}, h('span',{class:'num',text:'Bloco '+k}), 'Dados – '+MODS[k].nome),
+      h('div',{class:'grid2'}, MODS[k].campos.map(c=>field({label:c.l,path:`mods.${k}.${c.k}`,type:c.type||'text',options:c.opts,ph:c.ph,help:c.help,req:c.req}))),
+      k==='E'? h('div',{class:'stack',style:'gap:8px'}, h('div',{class:'lbl',text:'Demais integrantes da equipe'}),
+        h('p',{class:'help',text:'Opcional. Se o projeto foi feito em equipe, liste os colegas (você já está identificado). O relatório continua individual: descreva nas próximas etapas a sua participação e a sua análise.'}),
+        rowsEditor('mods.E.equipe',[{key:'nome',label:'Nome',w:'42%'},{key:'matricula',label:'Matrícula',w:'22%'},{key:'funcao',label:'Função no projeto',ph:'Ex.: bolsista, voluntário(a)'}],()=>({nome:'',matricula:'',funcao:''}))) : null,
+      ks.length>1? h('div',{class:'grid2'}, field({label:'Início',path:`mods.${k}.inicio`,type:'date'}), field({label:'Término',path:`mods.${k}.fim`,type:'date'}), field({label:'Carga horária desta atividade (h)',path:`mods.${k}.ch`,type:'number',min:0}),
+        multiOri()? field({label:'Orientador(a) desta atividade',path:`mods.${k}.orientador`,req:1,ph:S.ident.orientador||'Nome completo',help:'Se ficar em branco, vale o orientador(a) informado na Identificação.'}) : null) : null))));
+  }
+  if(ks.length>1){
+    const q=h('select',{id:'mesmoOri'}, ['Sim','Não'].map(o=>h('option',{value:o,text:o}))); q.value=S.ident.mesmoOrientador||'Sim';
+    q.addEventListener('change',()=>{ S.ident.mesmoOrientador=q.value; scheduleSave(); render(); });
+    out.splice(4,0,h('div',{class:'card',style:'margin-top:20px'}, h('div',{class:'field'}, h('label',{for:'mesmoOri',text:'As atividades têm o mesmo orientador(a)?'}),
+      h('p',{class:'help',text:'Se não, cada atividade recebe o seu orientador(a), e cada um assina o Termo de Validação e avalia a sua atividade (art. 6º, § 1º).'}), q)));
+    const soma=ks.reduce((a,k)=>a+(+S.mods[k].ch||0),0);
+    const tot=+S.ident.ch||0;
+    out.push(h('div',{class:'note info',style:'margin-top:16px',text:'Prática combinada: a nota final é a média ponderada pela carga horária de cada atividade, e você precisa de pelo menos 60 pontos em cada uma (art. 6º, § 1º).'}));
+    if(tot && soma && soma!==tot) out.push(h('div',{class:'note',style:'margin-top:10px',text:`A soma das cargas horárias (${soma} h) é diferente da carga horária total informada na identificação (${tot} h).`}));
+  }
+  if(ks.length){
+    const sugEl=h('b',{id:'sugTitulo'});
+    out.push(h('div',{class:'card',style:'margin-top:20px'}, h('h3',{class:'sub',text:'Título do relatório'}),
+      h('p',{class:'help',text:'O título identifica a sua experiência e segue um padrão por modalidade. Informe a sua área ou principal atuação e use a sugestão como ponto de partida; você pode editar depois.'}),
+      field({label:ks.length>1?'Área comum às atividades':'Área ou principal atuação',path:'ident.area',help:ks.length>1?'Na prática combinada, o título é temático: a área que une as atividades. O subtítulo lista as modalidades.':null,ph:ks.length>1?'Ex.: gerenciamento e manutenção de edificações':ks[0]==='E'?'Ex.: levantamento de patologias nas escolas da zona norte':'Ex.: gerenciamento de obras residenciais'}),
+      h('div',{class:'note info',style:'display:flex;flex-wrap:wrap;gap:10px;align-items:center'}, h('span',{}, 'Sugestão: ', sugEl), h('button',{type:'button',onclick:()=>{ const sg=sugestao(); S.ident.titulo=sg.titulo; S.ident.subtitulo=sg.subtitulo; scheduleSave(); render(); toast('Título preenchido. Ajuste se quiser.'); }},'Usar sugestão')),
+      h('div',{class:'grid2'},
+        field({label:'Título do relatório',path:'ident.titulo',req:1}),
+        field({label:'Subtítulo',path:'ident.subtitulo',help:'Opcional.'}))));
+    setTimeout(updSug);
+  }
+  if(!ks.length) out.push(h('p',{class:'help',style:'margin-top:16px',text:'Modalidades exclusivas de licenciaturas e de cursos superiores (art. 3º, V-b a V-d, VII, VIII e IX) não se aplicam aos cursos técnicos integrados.'}));
+  return out;
+}
+
+function stepIntro(){
+  return [...head('Etapa 3 · Seção 1','Introdução','Muita gente escreve a introdução por último, depois de descrever as atividades. Você pode pular esta etapa e voltar no fim.'),
+    h('div',{class:'card'}, field({label:'Texto da introdução',path:'introducao',type:'textarea',rows:12,count:{},
+      help:'Apresente o contexto (modalidade, local, período e carga horária), os objetivos geral e específicos da prática conforme o Plano de Atividades e a importância da prática para a sua formação e para o perfil profissional de conclusão do curso (PPC). No último parágrafo, diga o que cada seção do relatório traz. Separe os parágrafos com uma linha em branco.'}))];
+}
+
+function stepCarac(){
+  const ks=sel();
+  if(!ks.length) return [...head('Etapa 4 · Seção 3','Caracterização do contexto'), h('div',{class:'note'}, 'Escolha a sua modalidade na etapa 2 para ver os campos desta seção. ', h('button',{type:'button',onclick:()=>go(1)},'Ir para Modalidades'))];
+  const ol=caracOutline();
+  const cards=[]; let card=null;
+  ol.forEach(x=>{
+    if(x.head){ card=h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:x.num}), x.titulo)); cards.push(card); return; }
+    if(ks.length===1 && !card){ card=h('div',{class:'card'}); cards.push(card); }
+    card.append(h('div',{class:'stack',style:'gap:6px'}, h('div',{class:'lbl'}, h('span',{style:'font-family:var(--f-mono);color:var(--brand);font-weight:500;margin-right:8px',text:x.num}), x.titulo),
+      field({label:'',path:`carac.${x.key}.${x.idx}`,type:'textarea',rows:5,help:MODS[x.key].secoes[x.idx][1]})));
+  });
+  // tira rótulos vazios
+  cards.forEach(c=>c.querySelectorAll('label').forEach(l=>{ if(!l.textContent.trim()) l.remove(); }));
+  return [...head('Etapa 4 · Seção 3','Caracterização do contexto','Apresente o lugar, o projeto ou o empreendimento em que a prática aconteceu. Os campos mudam conforme a modalidade escolhida.'), h('div',{class:'stack'}, cards)];
+}
+
+function stepAtiv(){
+  const ks=sel();
+  const resHelp = ks.length? 'Apresente o que foi produzido ou alcançado. Para a sua modalidade: '+ks.map(k=>`${MODS[k].nome.toLowerCase()} — ${MODS[k].res}`).join('; ')+'.' : 'Apresente o que foi produzido ou alcançado.';
+  const desc=h('div',{class:'stack',style:'gap:12px'}, S.descricao.map((d,i)=>h('div',{class:'desc-item'},
+    h('div',{class:'desc-head'}, h('span',{class:'num',text:`4.2.${i+1}`}), (()=>{const inp=h('input',{'aria-label':`Título do item 4.2.${i+1}`,placeholder:'Título da atividade ou tema'}); bind(inp,`descricao.${i}.titulo`); return inp;})(),
+      h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover item',title:'Remover item',onclick:()=>{ S.descricao.splice(i,1); if(!S.descricao.length) S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'✕')),
+    (()=>{const ta=h('textarea',{'aria-label':`Texto do item 4.2.${i+1}`,rows:6,placeholder:'O que foi feito, como, com quais ferramentas, equipamentos, softwares ou normas técnicas, e qual foi a sua participação.'}); bind(ta,`descricao.${i}.texto`); return ta;})())));
+  return [...head('Etapa 5 · Seção 4','Atividades desenvolvidas'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:'4.1'}),'Plano de atividades e execução'),
+        h('p',{class:'help',text:'Liste as atividades do Plano de Atividades deferido (art. 4º, IV) e o que aconteceu com cada uma. Se alguma não foi realizada ou mudou, explique em Observações. Vira o Quadro 3 do relatório.'}),
+        rowsEditor('plano',[{key:'atividade',label:'Atividade prevista no Plano',type:'textarea',w:'40%'},{key:'situacao',label:'Situação',type:'select',options:['Realizada','Realizada parcialmente','Não realizada'],w:'18%'},{key:'ch',label:'CH (h)',type:'number',w:'11%'},{key:'obs',label:'Observações',type:'textarea'}],()=>({atividade:'',situacao:'Realizada',ch:'',obs:''}))),
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:'4.2'}),'Descrição das atividades'),
+        h('p',{class:'help',text:'Crie um item para cada atividade ou tema, em ordem cronológica ou temática. Fotos, esquemas e tabelas devem ser inseridos depois no Word, com legenda e fonte. Não exponha pessoas ou dados sigilosos sem autorização.'}),
+        desc, h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'+ Adicionar item'))),
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:'4.3'}),'Resultados e produtos'),
+        field({label:'',path:'resultados',type:'textarea',rows:7,help:resHelp}))
+    )].map(x=>{ if(x&&x.querySelectorAll) x.querySelectorAll('label').forEach(l=>{ if(!l.textContent.trim()) l.remove(); }); return x; });
+}
+
+function stepTeoria(){
+  return [...head('Etapa 6 · Seção 5','Relação entre teoria e prática','A articulação entre teoria e prática é o fundamento da prática profissional no IFRN (art. 2º). Mostre quais conhecimentos do curso você usou, tanto da formação técnica quanto da geral.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('div',{class:'lbl',text:'Quadro 4 – Disciplinas do curso e atividades'}),
+        h('p',{class:'help',text:'Inclua também conhecimentos novos que você precisou aprender e que não faziam parte do currículo.'}),
+        rowsEditor('teoria',[{key:'disciplina',label:'Disciplina / conhecimento',w:'35%',ph:'Ex.: Topografia'},{key:'aplicacao',label:'Como foi aplicado na prática',type:'textarea'}],()=>({disciplina:'',aplicacao:''}))),
+      h('div',{class:'card'}, field({label:'Texto analítico',path:'teoriaTexto',type:'textarea',rows:8,help:'Comente o quadro: em que a formação ajudou, o que faltou e como você buscou esse conhecimento.'})))];
+}
+function stepAnalise(){
+  return [...head('Etapa 7 · Seção 6','Análise crítica da experiência'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, field({label:'6.1 Aprendizagens e competências desenvolvidas',path:'aprendizagens',type:'textarea',rows:6,help:'Competências técnicas e também de relacionamento: comunicação, trabalho em equipe, autonomia, responsabilidade.'})),
+      h('div',{class:'card'}, field({label:'6.2 Dificuldades encontradas e soluções adotadas',path:'dificuldades',type:'textarea',rows:6})),
+      h('div',{class:'card'}, field({label:'6.3 Ética, segurança e relações de trabalho',path:'etica',type:'textarea',rows:6,help:'Normas de saúde e segurança, uso de EPIs, conduta ética, sigilo, relações com a equipe e com o público.'})))];
+}
+function stepConsid(){
+  return [...head('Etapa 8 · Seção 7','Considerações finais'),
+    h('div',{class:'card'}, field({label:'Texto das considerações finais',path:'consideracoes',type:'textarea',rows:10,count:{},help:'Retome os objetivos da introdução e diga se foram alcançados. Faça um balanço da contribuição da prática para a sua formação e para os seus planos profissionais. Apresente sugestões para a unidade concedente, o projeto ou o curso.'}))];
+}
+function stepResumo(){
+  return [...head('Etapa 9 · Pré e pós-textuais','Resumo, siglas e referências','Escreva o resumo por último, quando o resto do relatório estiver pronto.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'},
+        field({label:'Resumo',path:'resumo',type:'textarea',rows:9,req:1,count:{min:150,max:250},help:'Parágrafo único, voz ativa, terceira pessoa do singular. Informe a modalidade, o local e o período, o objetivo, as principais atividades, os resultados e as aprendizagens.'}),
+        field({label:'Palavras-chave',path:'palavras',req:1,ph:'palavra 1; palavra 2; palavra 3',help:'De 3 a 5, separadas por ponto e vírgula.'})),
+      h('div',{class:'card'}, field({label:'Agradecimentos',path:'agradecimentos',type:'textarea',rows:5,help:'Opcional. Se ficar em branco, a página não entra no relatório.'})),
+      h('div',{class:'card'}, h('div',{class:'lbl',text:'Lista de abreviaturas e siglas'}), h('p',{class:'help',text:'Opcional. Sai em ordem alfabética. Apague as linhas que não usar.'}),
+        rowsEditor('siglas',[{key:'sigla',label:'Sigla',w:'22%'},{key:'sig',label:'Significado'}],()=>({sigla:'',sig:''}))),
+      h('div',{class:'card'}, field({label:'Referências',path:'referencias',type:'textarea',rows:10,req:1,help:'Uma referência por linha, conforme a ABNT NBR 6023. Liste apenas o que foi citado no texto; a ordem alfabética é feita automaticamente.'})))];
+}
+
+function checks(){
+  const c=[]; const add=(ok,msg,lvl)=>c.push({ok,msg,lvl:ok?'ok':(lvl||'miss')});
+  const miss=identReq.filter(k=>!filled(S.ident[k]));
+  add(!miss.length, miss.length? `Identificação: faltam ${miss.length} campo(s) obrigatório(s).` : 'Identificação completa.');
+  const ks=sel(); add(ks.length>0, ks.length? `Modalidade(s): ${ks.map(k=>MODS[k].nome).join(', ')}.` : 'Nenhuma modalidade escolhida.');
+  if(multiOri()){ const n=orientadores().length; add(n>1, n>1? `${n} orientadores(as) assinarão o Termo de Validação.` : 'Orientadores diferentes marcados, mas só um nome informado.','warn'); }
+  ks.forEach(k=>{ const f=MODS[k].campos.filter(c=>c.req&&!filled(S.mods[k][c.k])); add(!f.length, f.length? `Dados de ${MODS[k].nome}: falta ${f.map(c=>c.l.toLowerCase()).join(', ')}.` : `Dados de ${MODS[k].nome} completos.`); });
+  add(filled(S.ident.titulo), filled(S.ident.titulo)? 'Título definido.' : 'Título do relatório vazio (etapa Modalidades e título).');
+  if(ks.length>1){ const soma=ks.reduce((a,k)=>a+(+S.mods[k].ch||0),0); if(+S.ident.ch && soma && soma!==+S.ident.ch) add(false,`Quadro 2: a soma por modalidade (${soma} h) difere do total (${S.ident.ch} h).`,'warn'); }
+  add(filled(S.introducao),'Introdução'+(filled(S.introducao)?' escrita.':' vazia.'));
+  if(ks.length){ const vz=ks.flatMap(k=>S.carac[k]).filter(v=>!filled(v)).length; add(!vz, vz? `Caracterização: ${vz} subseção(ões) vazia(s).`:'Caracterização completa.'); }
+  add(S.plano.some(r=>filled(r.atividade)),'Quadro de plano de atividades × execução'+(S.plano.some(r=>filled(r.atividade))?' preenchido.':' vazio.'));
+  const dv=S.descricao.filter(d=>!filled(d.texto)||!filled(d.titulo)).length; add(!dv, dv? `Descrição das atividades: ${dv} item(ns) sem título ou texto.`:'Descrição das atividades completa.');
+  add(filled(S.resultados),'Resultados e produtos'+(filled(S.resultados)?' escritos.':' vazios.'));
+  add(S.teoria.some(r=>filled(r.disciplina))&&filled(S.teoriaTexto),'Relação entre teoria e prática'+(S.teoria.some(r=>filled(r.disciplina))&&filled(S.teoriaTexto)?' completa.':' incompleta.'));
+  const av=[S.aprendizagens,S.dificuldades,S.etica].filter(v=>!filled(v)).length; add(!av, av?`Análise crítica: ${av} subseção(ões) vazia(s).`:'Análise crítica completa.');
+  add(filled(S.consideracoes),'Considerações finais'+(filled(S.consideracoes)?' escritas.':' vazias.'));
+  const w=words(S.resumo); add(w>=150&&w<=250, w? `Resumo com ${w} palavras (ideal: 150 a 250).`:'Resumo vazio.', w?'warn':'miss');
+  const pk=S.palavras.split(';').filter(x=>x.trim()).length; add(pk>=3&&pk<=5, `${pk} palavra(s)-chave (de 3 a 5).`, pk?'warn':'miss');
+  add(filled(S.referencias),'Referências'+(filled(S.referencias)?' listadas.':' vazias.'));
+  return c;
+}
+function stepRevisar(){
+  const c=checks(); const pend=c.filter(x=>!x.ok).length;
+  const ol=h('ol',{class:'outline'}, outline().map(([n,t,l])=>h('li',{class:'l'+l}, h('span',{class:'num',text:n}), h('span',{text:t}))));
+  return [...head('Etapa 10 · Conferência','Revisar e gerar', pend? `Há ${pend} ponto(s) para conferir. Você pode gerar o arquivo mesmo assim: os trechos vazios saem destacados em amarelo no Word.` : 'Tudo preenchido. Gere o arquivo e revise no Word antes de enviar ao seu orientador(a).'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Conferência'}), h('ul',{class:'checks'}, c.map(x=>h('li',{class:x.lvl==='ok'?'':x.lvl,text:x.msg})))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Estrutura que será gerada'}), ol),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Depois de gerar, no Word'}),
+        h('ul',{class:'checks'}, [
+          'Atualize o sumário: clique com o botão direito sobre ele e escolha "Atualizar campo" > "Atualizar o índice inteiro". Se o Word perguntar sobre atualizar campos ao abrir, responda Sim.',
+          'Insira fotos, organograma e gráficos onde fizer sentido, com título acima ("Figura 1 – …") e fonte abaixo. Se inserir ilustrações, crie a Lista de ilustrações antes do sumário.',
+          'Cole o Plano de Atividades deferido no Anexo A e os documentos comprobatórios no Anexo B.',
+          'Revise a ortografia e envie ao seu orientador(a). Ele(a) preenche e assina o Termo de Validação (art. 6º).',
+        ].map(t=>h('li',{class:'warn',text:t})))),
+      h('div',{class:'rowbtns'}, h('button',{type:'button',class:'primary',onclick:gerar},'Gerar relatório (.docx)'), h('button',{type:'button',onclick:salvarJSON},'Salvar rascunho'),
+        clearButton()))];
+}
+
+/* ====================== ARQUIVOS ====================== */
+const dlCap = (window.claude && typeof window.claude.use==='function') ? window.claude.use('downloads').catch(()=>null) : Promise.resolve(null);
+async function saveFile(filename, blob){
+  const cap = await dlCap;
+  if(cap){
+    try{ await cap.save({filename, data:blob}); toast(`${filename} pronto.`); }
+    catch(e){ if(e&&e.code==='declined') toast('Download cancelado.'); else if(e&&e.code==='rate_limited') toast('Já há um download aguardando confirmação.'); else toast('Não foi possível salvar o arquivo nesta visualização.'); }
+    return;
+  }
+  const url=URL.createObjectURL(blob); const a=h('a',{href:url,download:filename}); document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+  toast(`${filename} baixado.`);
+}
+const slug=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,40);
+function salvarJSON(){ saveFile(`Rascunho_PP_${slug(S.ident.estudante)||'relatorio'}.json`, new Blob([JSON.stringify(S,null,1)],{type:'application/json'})); }
+$('#btnSave').onclick=salvarJSON;
+$('#btnOpen').onclick=()=>$('#fileOpen').click();
+$('#fileOpen').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||!d.ident) throw 0; S=merge(blankState(),migrate(d)); scheduleSave(); go(0); toast('Rascunho aberto.'); }catch(_){ toast('Este arquivo não é um rascunho deste formulário.'); } e.target.value=''; };
+  r.readAsText(f);
+};
+$('#btnDocx').onclick=gerar;
+
+/* ====================== GERAÇÃO DO DOCX ====================== */
+function gerar(){
+  if(!window.docx){ toast('A biblioteca de geração não carregou. Verifique a conexão e recarregue a página.'); return; }
+  try{
+    const doc=buildDoc();
+    window.docx.Packer.toBlob(doc).then(b=>saveFile(`Relatorio_Pratica_Profissional_${slug(S.ident.estudante)||'estudante'}.docx`, b));
+  }catch(err){ console.error(err); toast('Erro ao gerar o arquivo: '+err.message); }
+}
+function fmtDate(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+
+function buildDoc(){
+  const D=window.docx;
+  const {Document,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,ShadingType,AlignmentType,HeadingLevel,PageBreak,Header,PageNumber,TableOfContents,BorderStyle,VerticalAlign}=D;
+  const FONT='Arial', W=9071, L15=360;
+  const I=S.ident, ks=sel(); const ORI=orientadores();
+  const ph=(txt)=>new TextRun({text:`[${txt}]`,font:FONT,highlight:'yellow'});
+  const v=(val,label)=> filled(val)? new TextRun({text:val.trim(),font:FONT}) : ph(label);
+  const t=(text,o={})=>new TextRun({text,font:FONT,...o});
+  const P=(children,o={})=>new Paragraph({children,spacing:{line:L15,after:0},alignment:AlignmentType.JUSTIFIED,indent:{firstLine:709},...o});
+  const center=(children,o={})=>new Paragraph({children,alignment:AlignmentType.CENTER,spacing:{line:L15,after:0},...o});
+  const blank=(n=1)=>Array.from({length:n},()=>new Paragraph({children:[t('')],spacing:{line:L15,after:0}}));
+  const br=()=>new Paragraph({children:[new PageBreak()]});
+  const H1=x=>new Paragraph({heading:HeadingLevel.HEADING_1,children:[t(x)],spacing:{after:360,line:L15}});
+  const H2=x=>new Paragraph({heading:HeadingLevel.HEADING_2,children:[t(x)],spacing:{before:360,after:360,line:L15}});
+  const H3=x=>new Paragraph({heading:HeadingLevel.HEADING_3,children:[t(x)],spacing:{before:360,after:360,line:L15}});
+  const HC=(x,toc=true)=>new Paragraph({heading:toc?HeadingLevel.HEADING_1:undefined,children:[t(x,{bold:true})],alignment:AlignmentType.CENTER,spacing:{after:360,line:L15}});
+  const paras=(txt,label)=>{ const ps=(txt||'').split(/\n+/).map(s=>s.trim()).filter(Boolean); return ps.length? ps.map(s=>P([t(s)])) : [P([ph(label)])]; };
+  const up=s=>(s||'').toLocaleUpperCase('pt-BR');
+  const b={style:BorderStyle.SINGLE,size:4,color:'000000'}; const borders={top:b,bottom:b,left:b,right:b};
+  const cell=(content,width,o={})=>new TableCell({width:{size:width,type:WidthType.DXA},borders,columnSpan:o.span,
+    shading:o.head?{type:ShadingType.CLEAR,fill:'E7E6E6',color:'auto'}:undefined,margins:{top:60,bottom:60,left:100,right:100},verticalAlign:VerticalAlign.CENTER,
+    children:[new Paragraph({children:[content instanceof TextRun? content : t(String(content??''),{bold:!!(o.head||o.bold),size:20})],alignment:o.head?AlignmentType.CENTER:AlignmentType.LEFT})]});
+  const small=(val,label)=> filled(val)? t(String(val).trim(),{size:20}) : new TextRun({text:`[${label}]`,font:FONT,size:20,highlight:'yellow'});
+  const quadro=(widths,header,rows)=>new Table({width:{size:widths.reduce((a,c)=>a+c,0),type:WidthType.DXA},columnWidths:widths,rows:[
+    ...(header?[new TableRow({tableHeader:true,cantSplit:true,children:header.map((x,i)=>cell(x,widths[i],{head:true}))})]:[]),
+    ...rows.map(r=>new TableRow({cantSplit:true,children:r.map((c,i)=>cell(c.content??c,(c.opts&&c.opts.span)?widths.reduce((x,y)=>x+y,0):widths[i],c.opts||{}))}))]});
+  let qn=0; const caption=x=>new Paragraph({children:[t(`Quadro ${++qn} – ${x}`)],spacing:{before:240,after:60},keepNext:true});
+  const fonte=(x='Fonte: autoria própria.')=>new Paragraph({children:[t(x,{size:20})],spacing:{before:60,after:240}});
+  const cursoNome=filled(I.curso)?I.curso.trim():'[Curso]';
+  const modsTxt = ks.length? ks.map(k=>nomeMod(k)).join(ks.length===2?' e ':', ').replace(/, ([^,]*)$/,' e $1') : '[modalidade]';
+  const modLabel = ks.length>1? 'nas modalidades' : 'na modalidade';
+  const periodo = (filled(I.inicio)?fmtDate(I.inicio):'[início]')+' a '+(filled(I.fim)?fmtDate(I.fim):'[término]');
+  const titulo = filled(I.titulo)? up(I.titulo.trim())+(filled(I.subtitulo)?': '+up(I.subtitulo.trim()):'') : null;
+  const tituloRun = titulo? t(titulo,{bold:true}) : new TextRun({text:'[TÍTULO DO RELATÓRIO]',font:FONT,bold:true,highlight:'yellow'});
+
+  // capa
+  const capa=[
+    center([t('INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO RIO GRANDE DO NORTE',{bold:true})]),
+    center([t('CAMPUS ',{bold:true}), filled(I.campus)? t(up(I.campus.trim()),{bold:true}) : ph('CAMPUS')]),
+    center([t(`CURSO TÉCNICO DE NÍVEL MÉDIO EM ${up(cursoNome)} NA FORMA INTEGRADA`,{bold:true})]),
+    ...blank(4), center([filled(I.estudante)?t(up(I.estudante.trim())):ph('NOME DO(A) ESTUDANTE')]),
+    ...blank(6), center([tituloRun]), ...blank(1),
+    ...blank(9), center([filled(I.cidade)?t(up(I.cidade.trim())):ph('CIDADE')]), center([v(I.ano,'ANO')]),
+  ];
+  const natureza=(runs)=>new Paragraph({children:runs,indent:{left:4536},alignment:AlignmentType.JUSTIFIED,spacing:{line:240,after:120}});
+  const assin=(nome,papel)=>[...blank(2),center([t('_______________________________________________')]),center([nome]),center([t(papel,{size:20})])];
+  const pre=[
+    center([filled(I.estudante)?t(up(I.estudante.trim())):ph('NOME DO(A) ESTUDANTE')]), ...blank(7), center([tituloRun]), ...blank(3),
+    natureza([t(`Relatório Final de Prática Profissional, ${modLabel} ${modsTxt}, apresentado à Coordenação do Curso Técnico de Nível Médio em ${cursoNome} na forma Integrada do Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte, Campus `), v(I.campus,'Campus'), t(`, como requisito parcial para a obtenção do diploma de Técnico(a) de Nível Médio em ${cursoNome}.`)]),
+    ...(ORI.length>1? [natureza([t('Orientadores(as): '+ORI.map(o=>(o.nome||'[nome]')+' ('+o.mods.map(nomeMod).join('; ')+')').join('; ')+'.')])] : [natureza([t('Orientador(a): '), v(I.orientador,'nome do(a) orientador(a)'), t('.')])]),
+    ...(S.mods.A.on && filled(S.mods.A.supervisor)? [natureza([t('Supervisor(a) de estágio: '+S.mods.A.supervisor.trim()+'.')])] : []),
+    ...(S.mods.B.on && filled(S.mods.B.monitor)? [natureza([t('Empregado(a) monitor(a): '+S.mods.B.monitor.trim()+'.')])] : []),
+    ...blank(7), center([filled(I.cidade)?t(up(I.cidade.trim())):ph('CIDADE')]), center([v(I.ano,'ANO')]), br(),
+    HC(ORI.length>1?'TERMO DE VALIDAÇÃO DO RELATÓRIO PELOS(AS) ORIENTADORES(AS)':'TERMO DE VALIDAÇÃO DO RELATÓRIO PELO(A) ORIENTADOR(A)',false),
+    center([filled(I.estudante)?t(up(I.estudante.trim())):ph('NOME DO(A) ESTUDANTE')]), center([tituloRun]), ...blank(1),
+    P([t(`${ORI.length>1?'Declaramos que analisamos':'Declaro que analisei'} o presente Relatório Final de Prática Profissional, desenvolvido ${modLabel} ${modsTxt}, no período de ${periodo}, com carga horária total de `), v(I.ch,'___'), t(` horas, e que o ${ORI.length>1?'consideramos':'considero'} em conformidade com o Plano de Atividades deferido, com a Regulamentação da Prática Profissional Discente do IFRN (Resolução nº 25/2019-CONSUP) e com o Projeto Pedagógico do Curso.`)]),
+    ...blank(1), P([t('Situação: (   ) Aprovado(a)     (   ) Reprovado(a)     (   ) Devolvido para ajustes')],{indent:{firstLine:0}}),
+    P([t('Data da validação: ____/____/________')],{indent:{firstLine:0}}),
+    ...ORI.flatMap(o=>assin(filled(o.nome)?t(/^prof/i.test(o.nome)?o.nome:'Prof.(ª) '+o.nome):ph('Orientador(a)'), 'Orientador(a) – IFRN'+(filled(I.campus)?', Campus '+I.campus.trim():'')+(ORI.length>1?' – '+o.mods.map(nomeMod).join('; '):''))),
+    ...assin(filled(I.estudante)?t(I.estudante.trim()):ph('Estudante'), 'Estudante – Matrícula '+(I.matricula||'[nº]')), br(),
+  ];
+  if(filled(S.agradecimentos)) pre.push(HC('AGRADECIMENTOS',false), ...paras(S.agradecimentos), br());
+  pre.push(HC('RESUMO',false), P([filled(S.resumo)? t(S.resumo.replace(/\s*\n+\s*/g,' ').trim()) : ph('Resumo')],{indent:{firstLine:0}}), ...blank(1),
+    P([t('Palavras-chave: ',{bold:true}), filled(S.palavras)? t(S.palavras.trim().replace(/\.?$/,'.')) : ph('palavra 1; palavra 2; palavra 3')],{indent:{firstLine:0}}), br());
+  const sig=S.siglas.filter(r=>filled(r.sigla)).sort((a,b)=>a.sigla.localeCompare(b.sigla,'pt-BR'));
+  if(sig.length) pre.push(HC('LISTA DE ABREVIATURAS E SIGLAS',false), quadro([1800,7271],null,sig.map(r=>[r.sigla.trim(), r.sig.trim()])), br());
+  pre.push(HC('SUMÁRIO',false), new TableOfContents('Sumário',{hyperlink:true,headingStyleRange:'1-3'}));
+
+  // textuais
+  const T=[];
+  T.push(H1('1 INTRODUÇÃO'), ...paras(S.introducao,'Introdução'), br());
+  T.push(H1('2 IDENTIFICAÇÃO DA PRÁTICA PROFISSIONAL'));
+  T.push(P([t(`O Quadro ${qn+1} apresenta os dados de identificação da prática profissional desenvolvida.`)]));
+  T.push(caption('Identificação da prática profissional'));
+  const idRows=[['Estudante',small(I.estudante,'nome')],['Matrícula',small(I.matricula,'nº')],['Curso / ano',t(`Técnico de Nível Médio em ${cursoNome} na forma Integrada`+(filled(I.anoCurso)?` / ${I.anoCurso.trim()}`:''),{size:20})],
+    ['Campus',small(I.campus,'campus')],...(multiOri()?[]:[['Orientador(a)',small(I.orientador,'orientador(a)')]]),
+    ['Período de realização',t(periodo,{size:20})],['Carga horária total',t(`${I.ch||'[___]'} horas`+(filled(I.jornada)?` (jornada de ${I.jornada} h/semana)`:''),{size:20})]];
+  const qrows=idRows.map(([a,c])=>[{content:a,opts:{bold:true}},{content:c}]);
+  if(!ks.length) qrows.push([{content:'Modalidade',opts:{bold:true}},{content:small('','modalidade')}]);
+  ks.forEach(k=>{
+    const m=S.mods[k];
+    qrows.push([{content:'Modalidade: '+nomeMod(k),opts:{head:true,span:2}}]);
+    if(multiOri()) qrows.push([{content:'Orientador(a)',opts:{bold:true}},{content:small((m.orientador||I.orientador||''),'orientador(a)')}]);
+    MODS[k].campos.forEach(c=>{ const val=c.type==='date'? fmtDate(m[c.k]) : m[c.k];
+      if(!c.req && !filled(val)) return;
+      const lab=c.k==='condicao'?'Participação do(a) estudante':c.k==='funcao'?'Função do(a) estudante':c.l;
+      qrows.push([{content:lab,opts:{bold:true}},{content:small(val,c.l.toLowerCase())}]); });
+    if(k==='E'){ const eq=(m.equipe||[]).filter(r=>filled(r.nome)); if(eq.length) qrows.push([{content:'Demais integrantes da equipe',opts:{bold:true}},{content:t(eq.map(r=>r.nome.trim()+(filled(r.matricula)?` (${r.matricula.trim()})`:'')+(filled(r.funcao)?` – ${r.funcao.trim()}`:'')).join('; '),{size:20})}]); }
+  });
+  T.push(quadro([3400,5671],null,qrows), fonte());
+  if(ks.length>1){
+    const soma=ks.reduce((a,k)=>a+(+S.mods[k].ch||0),0);
+    T.push(P([t(`Por se tratar de prática profissional combinada, o Quadro ${qn+1} apresenta a distribuição da carga horária por modalidade.`)]));
+    T.push(caption('Composição da prática profissional combinada'));
+    T.push(quadro([3200,2700,1871,1300],['Modalidade','Local / projeto','Período','Carga horária'],[
+      ...ks.map(k=>{const m=S.mods[k]; return [nomeMod(k),{content:small(m[MODS[k].principal],'local / projeto')},(m.inicio||m.fim)?`${fmtDate(m.inicio)} a ${fmtDate(m.fim)}`:{content:small('','período')},{content:small(m.ch?m.ch+' h':'','CH')}];}),
+      [{content:'Total',opts:{bold:true}},'','',{content:`${soma} h`,opts:{bold:true}}]]), fonte());
+  }
+  T.push(br(), H1('3 CARACTERIZAÇÃO DO CONTEXTO DA PRÁTICA PROFISSIONAL'));
+  if(!ks.length) T.push(P([ph('Escolha a modalidade no formulário')]));
+  caracOutline().forEach(x=>{
+    const title=`${x.num} ${up(x.titulo)}`;
+    if(x.head){ T.push(H2(title)); return; }
+    T.push(x.nivel===2? H2(title) : H3(`${x.num} ${x.titulo}`));
+    T.push(...paras(S.carac[x.key][x.idx], x.titulo));
+  });
+  T.push(br(), H1('4 ATIVIDADES DESENVOLVIDAS'), H2('4.1 PLANO DE ATIVIDADES E EXECUÇÃO'));
+  T.push(P([t(`O Quadro ${qn+1} relaciona as atividades previstas no Plano de Atividades com a sua execução.`)]));
+  T.push(caption('Plano de atividades e execução'));
+  const pl=S.plano.filter(r=>filled(r.atividade)||filled(r.obs));
+  T.push(quadro([3300,1700,1171,2900],['Atividade prevista no Plano','Situação','Carga horária','Observações'],
+    (pl.length?pl:[{atividade:'',situacao:'',ch:'',obs:''}]).map(r=>[{content:small(r.atividade,'atividade')},r.situacao||'',r.ch?r.ch+' h':'',r.obs||''])), fonte());
+  T.push(H2('4.2 DESCRIÇÃO DAS ATIVIDADES'));
+  S.descricao.forEach((d,i)=>{ T.push(H3(`4.2.${i+1} ${filled(d.titulo)?d.titulo.trim():'[Atividade ou tema]'}`)); T.push(...paras(d.texto,'Descrição da atividade')); });
+  T.push(H2('4.3 RESULTADOS E PRODUTOS'), ...paras(S.resultados,'Resultados e produtos'), br());
+  T.push(H1('5 RELAÇÃO ENTRE TEORIA E PRÁTICA'));
+  T.push(P([t(`O Quadro ${qn+1} sintetiza a relação entre as disciplinas do curso e as atividades desenvolvidas.`)]));
+  T.push(caption('Relação entre disciplinas do curso e atividades desenvolvidas'));
+  const te=S.teoria.filter(r=>filled(r.disciplina)||filled(r.aplicacao));
+  T.push(quadro([3000,6071],['Disciplina / conhecimento','Aplicação na prática profissional'],(te.length?te:[{disciplina:'',aplicacao:''}]).map(r=>[{content:small(r.disciplina,'disciplina')},{content:small(r.aplicacao,'aplicação')}])), fonte());
+  T.push(...paras(S.teoriaTexto,'Texto analítico sobre teoria e prática'), br());
+  T.push(H1('6 ANÁLISE CRÍTICA DA EXPERIÊNCIA'), H2('6.1 APRENDIZAGENS E COMPETÊNCIAS DESENVOLVIDAS'), ...paras(S.aprendizagens,'Aprendizagens e competências'),
+    H2('6.2 DIFICULDADES ENCONTRADAS E SOLUÇÕES ADOTADAS'), ...paras(S.dificuldades,'Dificuldades e soluções'),
+    H2('6.3 ÉTICA, SEGURANÇA E RELAÇÕES DE TRABALHO'), ...paras(S.etica,'Ética, segurança e relações de trabalho'), br());
+  T.push(H1('7 CONSIDERAÇÕES FINAIS'), ...paras(S.consideracoes,'Considerações finais'), br());
+  T.push(HC('REFERÊNCIAS'));
+  const refs=S.referencias.split(/\n+/).map(s=>s.trim()).filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  if(refs.length) refs.forEach(r=>T.push(new Paragraph({children:[t(r)],alignment:AlignmentType.LEFT,spacing:{line:240,after:240}})));
+  else T.push(P([ph('Referências')],{indent:{firstLine:0}}));
+  T.push(br(), HC('ANEXO A – PLANO DE ATIVIDADES DEFERIDO'), P([t('[Insira aqui a cópia do Plano de Atividades deferido pelo(a) orientador(a) e pela Coordenação do Curso – art. 4º, IV.]',{italics:true,color:'666666'})],{indent:{firstLine:0},alignment:AlignmentType.CENTER}));
+  T.push(br(), HC('ANEXO B – DOCUMENTOS COMPROBATÓRIOS DA PRÁTICA PROFISSIONAL'), P([t('[Insira aqui os documentos comprobatórios da prática profissional – art. 4º, V. Documentos usuais para a(s) sua(s) modalidade(s):]',{italics:true,color:'666666'})],{indent:{firstLine:0}}));
+  (ks.length?ks:KEYS).forEach(k=>T.push(P([t(`${MODS[k].nome}: `,{italics:true,bold:true,color:'666666'}), t(MODS[k].docs+'.',{italics:true,color:'666666'})],{indent:{firstLine:0}})));
+
+  const margin={top:1701,left:1701,bottom:1134,right:1134};
+  return new Document({
+    creator: I.estudante||'Estudante IFRN', title: titulo||'Relatório de Prática Profissional',
+    features:{updateFields:true},
+    styles:{ default:{document:{run:{font:FONT,size:24}}},
+      paragraphStyles:[
+        {id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',quickFormat:true,run:{font:FONT,size:24,bold:true,allCaps:true,color:'000000'},paragraph:{outlineLevel:0}},
+        {id:'Heading2',name:'Heading 2',basedOn:'Normal',next:'Normal',quickFormat:true,run:{font:FONT,size:24,bold:false,allCaps:true,color:'000000'},paragraph:{outlineLevel:1}},
+        {id:'Heading3',name:'Heading 3',basedOn:'Normal',next:'Normal',quickFormat:true,run:{font:FONT,size:24,bold:true,color:'000000'},paragraph:{outlineLevel:2}}]},
+    sections:[
+      {properties:{page:{margin}},children:capa},
+      {properties:{page:{margin,pageNumbers:{start:1}}},children:pre},
+      {properties:{page:{margin}},headers:{default:new Header({children:[new Paragraph({alignment:AlignmentType.RIGHT,children:[new TextRun({children:[PageNumber.CURRENT],font:FONT,size:20})]})]})},children:T},
+    ]});
+}
+
+/* ====================== EXEMPLO FICTÍCIO ====================== */
+const EXEMPLO={
+  ident:{estudante:'Ana Beatriz Lima (exemplo)',matricula:'20221011100000',campus:'Natal-Central',curso:'Edificações',anoCurso:'3º ano',cidade:'Natal',ano:String(new Date().getFullYear()),
+    titulo:'Estágio em gerenciamento de obras na Construtora Exemplo Ltda.',subtitulo:'',area:'gerenciamento de obras',orientador:'Carlos Eduardo Menezes (exemplo)',
+    inicio:'2026-03-02',fim:'2026-07-31',ch:'400',jornada:'20'},
+  mods:{A:{on:true,tipo:'Não obrigatório',concedente:'Construtora Exemplo Ltda., Natal/RN',supervisor:'Eng.ª Paula Freitas (exemplo), engenheira civil',registro:'Termo de Compromisso nº 000/2026',inicio:'',fim:'',ch:''}},
+  carac:{A:['A Construtora Exemplo Ltda. é uma empresa de pequeno porte do ramo da construção civil, com sede em Natal/RN. O estágio é obrigatório, conforme o PPC do curso.','Fundada em 2010, a empresa atua em obras residenciais multifamiliares de padrão médio na Grande Natal.','O estágio ocorreu no setor de execução de obras, com equipe de um engenheiro, dois mestres de obras e cerca de 40 operários.','A supervisão foi feita pela engenheira responsável pela obra, com reuniões semanais de planejamento.']},
+  introducao:'Este relatório apresenta as atividades desenvolvidas no estágio supervisionado realizado na Construtora Exemplo Ltda., entre março e julho de 2026, com carga horária de 400 horas.\nO objetivo geral foi acompanhar a execução de uma obra residencial multifamiliar, aplicando os conhecimentos de leitura de projetos, orçamento e controle tecnológico de materiais.',
+  plano:[{atividade:'Leitura e interpretação de projetos arquitetônicos e estruturais',situacao:'Realizada',ch:'80',obs:''},{atividade:'Acompanhamento da concretagem de lajes',situacao:'Realizada',ch:'120',obs:''},{atividade:'Levantamento de quantitativos',situacao:'Realizada parcialmente',ch:'60',obs:'Parte do levantamento foi feita pelo setor de orçamento.'}],
+  descricao:[{titulo:'Leitura de projetos',texto:'Durante as primeiras semanas, foram analisadas as pranchas do projeto arquitetônico e estrutural, com apoio da supervisora.'}],
+  teoria:[{disciplina:'Desenho Técnico e Arquitetônico',aplicacao:'Leitura de plantas, cortes e detalhes construtivos.'},{disciplina:'Materiais de Construção',aplicacao:'Recebimento do concreto usinado e moldagem de corpos de prova.'}],
+  palavras:'estágio; edificações; acompanhamento de obras',
+};
+
+/* ====================== INÍCIO ====================== */
+if(loadLocal()) $('#savedState').textContent='rascunho recuperado deste navegador';
+render();
+</script>
