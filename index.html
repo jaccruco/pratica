@@ -228,7 +228,7 @@ const blankState = () => ({
   carac:Object.fromEntries(KEYS.map(k=>[k,MODS[k].secoes.map(()=> '')])),
   introducao:'', objetivos:'',
   refIntro:'', ref:[], metIntro:'', met:[],
-  apendices:[], anexosExtra:[],
+  apendices:[], anexosExtra:[], estrutura:'', tabs:{},
   plano:[{atividade:'',situacao:'Realizada',ch:'',obs:''}],
   descricao:[{titulo:'',texto:''}],
   resultados:'',
@@ -376,8 +376,9 @@ function clearButton(){
 }
 
 /* ====================== FORMATO E NUMERAÇÃO DO RELATÓRIO ====================== */
-// Formato científico: projeto de pesquisa ou de extensão como única modalidade.
-const sci=()=>{ const k=sel(); return k.length===1 && k[0]==='E' && /pesquisa|extens/i.test(S.mods.E.tipo||''); };
+// Formato científico: projeto de ensino, pesquisa ou extensão como única modalidade.
+const sci=()=>{ const k=sel(); return k.length===1 && k[0]==='E' && /ensino|pesquisa|extens/i.test(S.mods.E.tipo||''); };
+const allTabs=tipo=>Object.values(S.tabs||{}).some(a=>a.some(x=>filled(x.titulo)&&(!tipo||x.tipo===tipo)));
 function secN(){ return sci()? {intro:1,ref:2,met:3,ativ:4,consid:5} : {intro:1,carac:2,ativ:3,consid:4}; }
 const coorients=()=>(S.ident.coorientador||'').split(';').map(s=>s.trim()).filter(Boolean);
 const figsOf=k=>(S.figs&&S.figs[k]||[]).filter(f=>filled(f.titulo));
@@ -414,9 +415,9 @@ function outline(){
   const o=[], n=secN(), A=ativLabels();
   const pre=['capa','folha de rosto', S.ident.banca?'folha de aprovação':'termo de validação'];
   if(filled(S.dedicatoria)) pre.push('dedicatória'); if(filled(S.agradecimentos)) pre.push('agradecimentos'); if(filled(S.epigrafe)) pre.push('epígrafe');
-  pre.push('resumo'); if(filled(S.abstract)) pre.push('abstract'); if(allFigs()) pre.push('lista de ilustrações'); if(S.siglas.some(r=>filled(r.sigla))) pre.push('lista de siglas'); pre.push('sumário');
+  pre.push('resumo'); if(filled(S.abstract)) pre.push('abstract'); if(allFigs()) pre.push('lista de figuras'); pre.push('lista de quadros'); if(allTabs('Tabela')) pre.push('lista de tabelas'); if(S.siglas.some(r=>filled(r.sigla))) pre.push('lista de siglas'); pre.push('sumário');
   o.push(['', 'Pré-textuais: '+pre.join(', '),0]);
-  o.push(['1','Introdução',1]); if(sci()){ o.push(['1.1','Contextualização',2]); o.push(['1.2','Objetivos',2]); o.push(['1.3','Justificativa',2]); }
+  o.push(['1','Introdução',1]); if(sci()){ o.push(['1.1','Contextualização',2]); o.push(['1.2','Objetivos',2]); o.push(['1.3','Justificativa',2]); o.push(['1.4','Estrutura do relatório',2]); }
   if(sci()){ o.push([String(n.ref),'Referencial teórico',1]); S.ref.forEach((x,i)=>o.push([`${n.ref}.${i+1}`,x.titulo||'[Subseção]',2])); o.push([String(n.met),'Metodologia',1]); S.met.forEach((x,i)=>o.push([`${n.met}.${i+1}`,x.titulo||'[Subseção]',2])); }
   else { o.push(['2','Caracterização do contexto da prática profissional',1]); caracOutline().forEach(x=>o.push([x.num,x.titulo,x.nivel])); }
   const AT = sci()? ['Resultados e discussão','Atividades realizadas','Resultados obtidos','Discussão dos resultados','Desafios e aprendizagens'] : ['Atividades desenvolvidas e resultados','Plano de atividades e execução','Descrição das atividades','Resultados e produtos','Desafios e aprendizagens'];
@@ -435,7 +436,7 @@ const identReq=['estudante','matricula','campus','curso','cidade','ano','orienta
 const STEPS=[
   {t:'Identificação', s:'Capa, folha de rosto, orientação', st:()=>ratio(identReq.map(k=>S.ident[k])), r:stepIdent},
   {t:'Modalidades e título', s:'Dados da prática · formulário de identificação', st:()=>{const k=sel(); if(!k.length) return 'empty'; return ratio([S.ident.titulo,...k.flatMap(x=>[...MODS[x].campos.filter(c=>c.req).map(c=>S.mods[x][c.k]), ...(k.length>1?[S.mods[x].ch,S.mods[x].inicio,S.mods[x].fim]:[])])]); }, r:stepMods},
-  {t:'Introdução', s:()=>sci()?'Seção 1 · contexto, objetivos e justificativa':'Seção 1', st:()=>ratio(sci()?[S.introducao,S.objetivos,S.carac.E[1]]:[S.introducao]), r:stepIntro},
+  {t:'Introdução', s:()=>sci()?'Seção 1 · contexto, objetivos, justificativa':'Seção 1', st:()=>ratio(sci()?[S.introducao,S.objetivos,S.carac.E[1],S.estrutura]:[S.introducao]), r:stepIntro},
   {t:()=>sci()?'Referencial teórico':'Caracterização', s:'Seção 2', st:()=>{const k=sel(); if(!k.length) return 'na'; if(sci()) return ratio([S.refIntro||S.ref.some(x=>filled(x.texto))]); return ratio(k.flatMap(x=>S.carac[x])); }, r:stepCarac},
   {t:'Metodologia', s:'Seção 3', show:()=>sci(), st:()=>ratio([S.metIntro||S.met.some(x=>filled(x.texto))]), r:stepMet},
   {t:()=>sci()?'Resultados e discussão':'Atividades e resultados', s:()=>'Seção '+secN().ativ, st:()=>ratio([S.plano.some(r=>filled(r.atividade)), S.descricao.some(d=>filled(d.texto)), S.resultados, S.desafios, S.teoria.some(r=>filled(r.disciplina))]), r:stepAtiv},
@@ -476,6 +477,13 @@ function figEditor(key){
     rowsEditor(`figs.${key}`,[{key:'titulo',label:'Título da figura',w:'60%',ph:'Ex.: Teste de densidade da gasolina'},{key:'fonte',label:'Fonte',ph:'Acervo próprio ('+(S.ident.ano||new Date().getFullYear())+')'}],()=>({titulo:'',fonte:''}),{empty:true,add:'+ Adicionar figura'}));
 }
 
+function tabEditor(key){
+  if(!S.tabs) S.tabs={}; if(!S.tabs[key]) S.tabs[key]=[];
+  return h('div',{class:'stack',style:'gap:8px'},
+    h('div',{class:'lbl',style:'font-size:.88rem',text:'Tabelas e quadros desta parte (opcional)'}),
+    h('p',{class:'help',text:'Tabela é para dados numéricos (bordas laterais abertas); quadro é para informações em texto (todas as bordas). Cole os dados com uma linha por linha da tabela e as colunas separadas por ponto e vírgula; a primeira linha é o cabeçalho. Se deixar os dados em branco, o Word sai com uma tabela vazia para você preencher.'}),
+    rowsEditor(`tabs.${key}`,[{key:'tipo',label:'Tipo',type:'select',options:['Tabela','Quadro'],w:'12%'},{key:'titulo',label:'Título',w:'28%',ph:'Ex.: Taxa de queima por formulação'},{key:'dados',label:'Dados (opcional)',type:'textarea',ph:'Amostra; Massa (g); Tempo (s)\n1; 23,3; 21\n2; 24,5; 21'},{key:'fonte',label:'Fonte',w:'18%',ph:'Autoria própria ('+(S.ident.ano||new Date().getFullYear())+')'}],()=>({tipo:'Tabela',titulo:'',dados:'',fonte:''}),{empty:true,add:'+ Adicionar tabela ou quadro'}));
+}
 function stepIdent(){
   let confirmBox=null;
   const banca = S.ident.banca? h('div',{class:'stack',style:'gap:12px'},
@@ -561,9 +569,11 @@ function stepIntro(){
       filled(S.objetivos)? h('div',{class:'card'}, field({label:'Objetivos',path:'objetivos',type:'textarea',rows:4,help:'Este texto vem de uma versão anterior do rascunho e entra no fim da introdução. Se preferir, mova-o para o texto acima e apague este campo.'})) : null)];
   return [...head(`Etapa 3 · Seção ${n.intro}`,'Introdução','No formato científico, a introdução traz a contextualização do tema, os objetivos e a justificativa do projeto. Muita gente escreve esta parte por último.'),
     h('div',{class:'stack'},
-      h('div',{class:'card'}, field({label:`${n.intro}.1 Contextualização`,path:'introducao',type:'textarea',rows:10,count:{},help:'Apresente o tema e o problema ou a demanda que originou o projeto, com apoio da literatura (citações conforme a NBR 10520). Apresente também o projeto: tipo, edital, coordenação, período e, se for o caso, a equipe e a sua parte nela. No último parágrafo, diga o que cada seção do relatório traz.'})),
+      h('div',{class:'card'}, field({label:`${n.intro}.1 Contextualização`,path:'introducao',type:'textarea',rows:10,count:{},help:'Apresente o tema e o problema ou a demanda que originou o projeto, com apoio da literatura (citações conforme a NBR 10520). Apresente também o projeto: tipo, edital, coordenação, período e, se for o caso, a equipe e a sua parte nela.'})),
       h('div',{class:'card'}, field({label:`${n.intro}.2 Objetivos`,path:'objetivos',type:'textarea',rows:6,help:'Escreva o objetivo geral e, em seguida, os objetivos específicos (um por linha).'})),
-      h('div',{class:'card'}, field({label:`${n.intro}.3 Justificativa`,path:'carac.E.1',type:'textarea',rows:6,help:'Explique a relevância do projeto para a comunidade, para a área técnica e para a sua formação.'})))];
+      h('div',{class:'card'}, field({label:`${n.intro}.3 Justificativa`,path:'carac.E.1',type:'textarea',rows:6,help:'Explique a relevância do projeto para a comunidade, para a área técnica e para a sua formação.'})),
+      h('div',{class:'card'}, field({label:`${n.intro}.4 Estrutura do relatório`,path:'estrutura',type:'textarea',rows:5,help:'Diga, em um parágrafo, o que cada seção do relatório apresenta.'}),
+        h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ const N=secN(); S.estrutura=`Este relatório está organizado em ${N.consid} seções. Após esta introdução, a seção ${N.ref} apresenta o referencial teórico que fundamenta o projeto; a seção ${N.met} descreve a metodologia adotada; a seção ${N.ativ} apresenta e discute os resultados obtidos, os desafios e as aprendizagens, bem como a relação entre teoria e prática; e a seção ${N.consid} traz as considerações finais.`; scheduleSave(); render(); toast('Texto sugerido. Ajuste se quiser.'); }},'Sugerir texto a partir da estrutura'))))];
 }
 
 function stepCarac(){
@@ -600,10 +610,10 @@ function stepAtiv(){
     : ks.length? 'Apresente o que foi produzido ou alcançado. Para a sua modalidade: '+ks.map(k=>`${MODS[k].nome.toLowerCase()} — ${MODS[k].res}`).join('; ')+'.' : 'Apresente o que foi produzido ou alcançado.';
   const desc=h('div',{class:'stack',style:'gap:12px'}, S.descricao.map((d,i)=>h('div',{class:'desc-item'},
     h('div',{class:'desc-head'}, h('span',{class:'num',text:`${N}.2.${i+1}`}), (()=>{const inp=h('input',{'aria-label':`Título do item ${N}.2.${i+1}`,placeholder:S1?'Título do resultado ou etapa':'Título da atividade ou tema'}); bind(inp,`descricao.${i}.titulo`); return inp;})(),
-      h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover item',title:'Remover item',onclick:()=>{ S.descricao.splice(i,1); for(let j=i;j<S.descricao.length;j++) S.figs['desc_'+j]=S.figs['desc_'+(j+1)]||[]; delete S.figs['desc_'+S.descricao.length]; if(!S.descricao.length) S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'✕')),
+      h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover item',title:'Remover item',onclick:()=>{ S.descricao.splice(i,1); for(let j=i;j<S.descricao.length;j++){ S.figs['desc_'+j]=S.figs['desc_'+(j+1)]||[]; if(S.tabs) S.tabs['desc_'+j]=S.tabs['desc_'+(j+1)]||[]; } delete S.figs['desc_'+S.descricao.length]; if(S.tabs) delete S.tabs['desc_'+S.descricao.length]; if(!S.descricao.length) S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'✕')),
     (()=>{const ta=h('textarea',{'aria-label':`Texto do item ${N}.2.${i+1}`,rows:6,placeholder:S1?'O que foi obtido nesta etapa, com dados, medições ou produtos, e qual foi a sua participação.':'O que foi feito, como, com quais ferramentas, equipamentos, softwares ou normas técnicas, e qual foi a sua participação.'}); bind(ta,`descricao.${i}.texto`); return ta;})(),
     (()=>{const ta=h('textarea',{'aria-label':`Conhecimentos do curso aplicados no item ${N}.2.${i+1}`,rows:2,placeholder:'Conhecimentos do curso aplicados (opcional). Ex.: Os conteúdos de Desenho Técnico foram essenciais para interpretar as pranchas do projeto.'}); bind(ta,`descricao.${i}.conhecimentos`); return ta;})(),
-    figEditor('desc_'+i))));
+    figEditor('desc_'+i), tabEditor('desc_'+i))));
   return [...head(`Etapa 5 · Seção ${N}`, S1?'Resultados e discussão':'Atividades desenvolvidas e resultados', 'Aqui entram também os desafios e as aprendizagens da experiência.'),
     h('div',{class:'stack'},
       h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.1`}), S1?'Atividades realizadas':'Plano de atividades e execução'),
@@ -613,7 +623,7 @@ function stepAtiv(){
         h('p',{class:'help',text:S1?'Crie um item para cada resultado ou etapa do projeto. Não exponha pessoas ou dados sigilosos sem autorização.':'Crie um item para cada atividade ou tema, em ordem cronológica ou temática. Não exponha pessoas ou dados sigilosos sem autorização.'}),
         desc, h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'+ Adicionar item'))),
       h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.3`}), S1?'Discussão dos resultados':'Resultados e produtos'),
-        field({label:'',path:'resultados',type:'textarea',rows:7,help:resHelp}), figEditor('resultados')),
+        field({label:'',path:'resultados',type:'textarea',rows:7,help:resHelp}), figEditor('resultados'), tabEditor('resultados')),
       h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.4`}),'Desafios e aprendizagens'),
         field({label:'',path:'desafios',type:'textarea',rows:8,help:'Dificuldades encontradas e como foram resolvidas; competências técnicas e de relacionamento desenvolvidas (comunicação, trabalho em equipe, autonomia); cuidados com ética, sigilo, saúde e segurança.'})),
       h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.5`}),'Relação entre teoria e prática'),
@@ -660,7 +670,7 @@ function checks(){
   add(!miss.length, miss.length? `Identificação: faltam ${miss.length} campo(s) obrigatório(s).` : 'Identificação completa.');
   if(S.ident.banca){ const ex=S.examinadores.filter(r=>filled(r.nome)).length; add(ex>0, ex? `Banca: ${ex} examinador(es) informado(s).` : 'Banca marcada, mas nenhum examinador informado.','warn'); }
   const ks=sel(); add(ks.length>0, ks.length? `Modalidade(s): ${ks.map(k=>nomeMod(k)).join(', ')}.` : 'Nenhuma modalidade escolhida.');
-  if(sci()) add(true,'Formato científico (projeto de pesquisa ou de extensão).');
+  if(sci()) add(true,'Formato científico (projeto de ensino, pesquisa ou extensão).');
   if(multiOri()){ const n=orientadores().length; add(n>1, n>1? `${n} orientadores(as) assinarão o Termo de Validação.` : 'Orientadores diferentes marcados, mas só um nome informado.','warn'); }
   ks.forEach(k=>{ const f=MODS[k].campos.filter(c=>c.req&&!filled(S.mods[k][c.k])); add(!f.length, f.length? `Dados de ${MODS[k].nome}: falta ${f.map(c=>c.l.toLowerCase()).join(', ')}.` : `Dados de ${MODS[k].nome} completos.`); });
   add(filled(S.ident.titulo), filled(S.ident.titulo)? 'Título definido.' : 'Título do relatório vazio (etapa Modalidades e título).');
@@ -772,6 +782,21 @@ function buildDoc(){
         borders:{top:{style:BorderStyle.DASHED,size:6,color:'999999'},bottom:{style:BorderStyle.DASHED,size:6,color:'999999'},left:{style:BorderStyle.DASHED,size:6,color:'999999'},right:{style:BorderStyle.DASHED,size:6,color:'999999'}},
         children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'[Cole aqui a imagem e apague esta moldura]',font:FONT,size:20,italics:true,color:'777777',highlight:'yellow'})]})]})]})]}),
       new Paragraph({children:[t('Fonte: '+(filled(f.fonte)?f.fonte.trim():'Acervo próprio ('+(I.ano||'')+')')+'.',{size:20})],alignment:AlignmentType.CENTER,spacing:{before:60,after:240}})]; });
+  let tn=0;
+  const tabelas=key=>((S.tabs&&S.tabs[key])||[]).filter(x=>filled(x.titulo)).flatMap(x=>{
+    const isT=x.tipo!=='Quadro'; let num; if(isT) num=++tn; else num=++qn;
+    let linhas=(x.dados||'').split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(';').map(c=>c.trim()));
+    const vaz=!linhas.length; if(vaz) linhas=[['[Coluna 1]','[Coluna 2]','[Coluna 3]'],['','',''],['','',''],['','','']];
+    const nc=Math.max(...linhas.map(r=>r.length)); linhas=linhas.map(r=>r.concat(Array(nc-r.length).fill('')));
+    const cw=Math.floor(W/nc), widths=Array(nc).fill(cw); widths[nc-1]=W-cw*(nc-1);
+    const none={style:BorderStyle.NONE,size:0,color:'FFFFFF'}, line={style:BorderStyle.SINGLE,size:6,color:'000000'};
+    const rows=linhas.map((r,ri)=>new TableRow({cantSplit:true,tableHeader:ri===0,children:r.map((c,ci)=>new TableCell({width:{size:widths[ci],type:WidthType.DXA},margins:{top:50,bottom:50,left:90,right:90},verticalAlign:VerticalAlign.CENTER,
+      borders: isT? {top: ri<=1?line:none, bottom: (ri===0||ri===linhas.length-1)?line:none, left:none, right:none} : borders,
+      shading: (!isT&&ri===0)?{type:ShadingType.CLEAR,fill:'E7E6E6',color:'auto'}:undefined,
+      children:[new Paragraph({alignment:AlignmentType.CENTER,children:[ (vaz&&ri>0)? new TextRun({text:' ',font:FONT,size:20}) : t(c,{size:20,bold:ri===0}) ]})]}))}));
+    return [new Paragraph({children:[t(isT?'Tabela ':'Quadro '), new SimpleField(isT?' SEQ Tabela \\* ARABIC ':' SEQ Quadro \\* ARABIC ', String(num)), t(` – ${x.titulo.trim()}`)],spacing:{before:240,after:60},keepNext:true}),
+      new Table({width:{size:W,type:WidthType.DXA},columnWidths:widths,rows}),
+      new Paragraph({children:[t('Fonte: '+(filled(x.fonte)?x.fonte.trim():'Autoria própria ('+(I.ano||'')+')')+'.',{size:20})],spacing:{before:60,after:240}})]; });
   const cursoNome=filled(I.curso)?I.curso.trim():'[Curso]';
   const modsTxt = ks.length? ks.map(k=>nomeMod(k)).join(ks.length===2?' e ':', ').replace(/, ([^,]*)$/,' e $1') : '[modalidade]';
   const modLabel = ks.length>1? 'nas modalidades' : 'na modalidade';
@@ -820,7 +845,9 @@ function buildDoc(){
       P([t('Data da validação: ____/____/________')],{indent:{firstLine:0}}),
       ...ORI.flatMap(o=>assin(filled(o.nome)?t(prof(o.nome)):ph('Orientador(a)'), 'Orientador(a) – IFRN'+(filled(I.campus)?', Campus '+I.campus.trim():'')+(ORI.length>1?' – '+o.mods.map(nomeMod).join('; '):''))),
       ...COO.flatMap(c=>assin(t(prof(c)),'Coorientador(a)')),
-      ...assin(filled(I.estudante)?t(I.estudante.trim()):ph('Estudante'), 'Estudante – Matrícula '+(I.matricula||'[nº]')), br());
+      ...assin(filled(I.estudante)?t(I.estudante.trim()):ph('Estudante'), 'Estudante – Matrícula '+(I.matricula||'[nº]')),
+      ...blank(1), P([t('Ciência da Coordenação do Curso em ____/____/________.')],{indent:{firstLine:0}}),
+      ...assin(t('Nome: ______________________________________'), `Coordenador(a) do Curso Técnico de Nível Médio em ${cursoNome} na forma Integrada`), br());
   }
   if(filled(S.dedicatoria)) pre.push(...blank(28), ...S.dedicatoria.split(/\n+/).filter(x=>x.trim()).map(x=>new Paragraph({children:[t(x.trim(),{italics:true})],alignment:AlignmentType.RIGHT,indent:{left:4536},spacing:{line:L15}})), br());
   if(filled(S.agradecimentos)) pre.push(HC('AGRADECIMENTOS',false), ...paras(S.agradecimentos), br());
@@ -830,9 +857,9 @@ function buildDoc(){
     P([t('Palavras-chave: ',{bold:true}), filled(S.palavras)? t(S.palavras.trim().replace(/\.?$/,'.')) : ph('palavra 1; palavra 2; palavra 3')],{indent:{firstLine:0}}), br());
   if(filled(S.abstract)) pre.push(HC('ABSTRACT',false), P([t(S.abstract.replace(/\s*\n+\s*/g,' ').trim(),{italics:true})],{indent:{firstLine:0}}), ...blank(1),
     P([t('Keywords: ',{bold:true}), filled(S.keywords)? t(S.keywords.trim().replace(/\.?$/,'.')) : ph('word 1; word 2; word 3')],{indent:{firstLine:0}}), br());
-  if(allFigs()) pre.push(HC('LISTA DE ILUSTRAÇÕES',false),
-    new TableOfContents('Figuras',{hyperlink:true,captionLabelIncludingNumbers:'Figura'}),
-    new TableOfContents('Quadros',{hyperlink:true,captionLabelIncludingNumbers:'Quadro'}), br());
+  if(allFigs()) pre.push(HC('LISTA DE FIGURAS',false), new TableOfContents('Lista de figuras',{hyperlink:true,captionLabelIncludingNumbers:'Figura'}), br());
+  pre.push(HC('LISTA DE QUADROS',false), new TableOfContents('Lista de quadros',{hyperlink:true,captionLabelIncludingNumbers:'Quadro'}), br());
+  if(allTabs('Tabela')) pre.push(HC('LISTA DE TABELAS',false), new TableOfContents('Lista de tabelas',{hyperlink:true,captionLabelIncludingNumbers:'Tabela'}), br());
   const sig=S.siglas.filter(r=>filled(r.sigla)).sort((a,b)=>a.sigla.localeCompare(b.sigla,'pt-BR'));
   if(sig.length) pre.push(HC('LISTA DE ABREVIATURAS E SIGLAS',false), quadro([1800,7271],null,sig.map(r=>[r.sigla.trim(), r.sig.trim()])), br());
   pre.push(HC('SUMÁRIO',false), new TableOfContents('Sumário',{hyperlink:true,headingStyleRange:'1-3'}));
@@ -843,6 +870,7 @@ function buildDoc(){
     T.push(H1(`${N.intro} INTRODUÇÃO`), H2(`${N.intro}.1 CONTEXTUALIZAÇÃO`), ...paras(S.introducao,'Contextualização'));
     T.push(H2(`${N.intro}.2 OBJETIVOS`), ...paras(S.objetivos,'Objetivo geral e objetivos específicos'));
     T.push(H2(`${N.intro}.3 JUSTIFICATIVA`), ...paras(S.carac.E[1],'Justificativa'));
+    T.push(H2(`${N.intro}.4 ESTRUTURA DO RELATÓRIO`), ...paras(S.estrutura,'Estrutura do relatório'));
   } else { T.push(H1(`${N.intro} INTRODUÇÃO`), ...paras(S.introducao,'Introdução')); if(filled(S.objetivos)) T.push(...paras(S.objetivos)); }
   if(SCI){
     const secSubs=(num,titulo,intro,subs,pref,label)=>{ T.push(br(), H1(`${num} ${titulo}`));
@@ -868,8 +896,8 @@ function buildDoc(){
   T.push(quadro([3300,1700,1171,2900],['Atividade prevista no Plano','Situação','Carga horária','Observações'],
     (pl.length?pl:[{atividade:'',situacao:'',ch:'',obs:''}]).map(r=>[{content:small(r.atividade,'atividade')},r.situacao||'',r.ch?r.ch+' h':'',r.obs||''])), fonte());
   T.push(H2(A.desc));
-  S.descricao.forEach((d,i)=>{ T.push(H3(`${A.n}.2.${i+1} ${filled(d.titulo)?d.titulo.trim():(SCI?'[Resultado ou etapa]':'[Atividade ou tema]')}`)); T.push(...paras(d.texto, SCI?'Resultado obtido':'Descrição da atividade')); if(filled(d.conhecimentos)) T.push(...paras(d.conhecimentos)); T.push(...figuras('desc_'+i)); });
-  T.push(H2(A.res), ...paras(S.resultados, SCI?'Discussão dos resultados':'Resultados e produtos'), ...figuras('resultados'));
+  S.descricao.forEach((d,i)=>{ T.push(H3(`${A.n}.2.${i+1} ${filled(d.titulo)?d.titulo.trim():(SCI?'[Resultado ou etapa]':'[Atividade ou tema]')}`)); T.push(...paras(d.texto, SCI?'Resultado obtido':'Descrição da atividade')); if(filled(d.conhecimentos)) T.push(...paras(d.conhecimentos)); T.push(...figuras('desc_'+i), ...tabelas('desc_'+i)); });
+  T.push(H2(A.res), ...paras(S.resultados, SCI?'Discussão dos resultados':'Resultados e produtos'), ...figuras('resultados'), ...tabelas('resultados'));
   T.push(H2(A.des), ...paras(S.desafios,'Desafios e aprendizagens'));
   T.push(H2(A.teo));
   T.push(P([t(`O Quadro ${qn+1} sintetiza a relação entre as disciplinas do curso e as atividades desenvolvidas.`)]));
