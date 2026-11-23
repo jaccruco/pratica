@@ -1,607 +1,1081 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tempo · IFRN Campus Apodi</title>
+<title>Relatório de Prática Profissional</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/docx@9.5.1/dist/index.iife.js"></script>
 <style>
-  :root{
-    --bg:#f5f2ea; --card:#fffdf8; --ink:#17231d; --muted:#5f6b63; --line:#e6e0d2; --soft:#faf6ec;
-    --green:#2f9e41; --green-d:#1d6b2b; --green-l:#e4f3e5;
-    --red:#c8191e; --sun:#f0a011; --sun-l:#fff2d6; --rain:#2b78b8; --rain-l:#e2eef8;
-    --radius:24px; --shadow:0 1px 0 rgba(23,35,29,.04),0 10px 30px -14px rgba(23,35,29,.2);
-    --rot:14s;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  .num{font-family:Sora,Figtree,sans-serif;font-variant-numeric:tabular-nums}
-
-  /* ===== Palco: tudo cabe em uma tela (escala proporcional) ===== */
-  html.fit,body.fit{overflow:hidden;height:100%;width:100%}
-  #diag{position:fixed;left:8px;bottom:8px;z-index:9;background:rgba(23,35,29,.88);color:#fff;font:600 14px Figtree,sans-serif;padding:8px 12px;border-radius:10px}
-  #stage{display:flex;flex-direction:column;gap:20px;padding:28px 36px 20px}
-  body.fit #stage{position:fixed;top:0;left:0;transform-origin:0 0}
-
-  /* Cabeçalho */
-  header{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;flex:none}
-  .brand img{height:82px;width:auto;display:block}
-  .clock{text-align:center}
-  .clock .t{font:600 60px/1 Sora,sans-serif;letter-spacing:-1.5px}
-  .clock .d{color:var(--muted);font-size:18px;margin-top:4px}
-  .conn{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-  .status{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;padding:8px 15px;border-radius:999px;background:var(--green-l);color:var(--green-d)}
-  .status i{width:9px;height:9px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-  .status.demo{background:var(--sun-l);color:#7a5200}.status.demo i{background:var(--sun)}
-  .conn-sub{font-size:14px;color:var(--muted)}
-  @keyframes pulse{50%{opacity:.35}}
-
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 28px}
-  .label{font:700 14px Figtree,sans-serif;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted)}
-
-  .top{flex:1.8;min-height:0;display:grid;grid-template-columns:1.12fr 1fr;gap:20px}
-
-  /* Destaque: condição atual */
-  .hero{display:flex;flex-direction:column;justify-content:space-between;gap:18px;background:linear-gradient(135deg,#fffdf8 0%,#fbf1d9 100%);min-height:0}
-  .now{display:flex;align-items:center;gap:30px}
-  .now .icon svg{width:170px;height:170px;display:block}
-  .now-temp{font:300 136px/.85 Sora,sans-serif;letter-spacing:-6px}
-  .now-temp sup{font-size:.34em;letter-spacing:0;vertical-align:1.25em;font-weight:400;margin-left:6px}
-  .now-desc{font:600 28px Sora,sans-serif;margin-top:10px}
-  .now-sub{color:var(--muted);margin-top:8px;font-size:19px}
-  .now-sub b{color:var(--ink);font-weight:600}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-  .chip{font-size:15px;font-weight:600;padding:6px 13px;border-radius:999px;background:var(--green-l);color:var(--green-d)}
-  .chip.warn{background:#fde6e4;color:var(--red)}
-  .chip.sun{background:var(--sun-l);color:#8a5a00}
-  .chip.rain{background:var(--rain-l);color:#1c5487}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .stat{background:rgba(255,255,255,.75);border:1px solid var(--line);border-radius:16px;padding:13px 16px}
-  .stat .k{font-size:14px;color:var(--muted);font-weight:600}
-  .stat .v{font:600 28px Sora,sans-serif;margin-top:3px;white-space:nowrap}
-  .stat .v small{font:500 15px Figtree,sans-serif;color:var(--muted);margin-left:3px}
-  .stat .s{font-size:14px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .uvbar{height:6px;border-radius:6px;margin-top:7px;background:linear-gradient(90deg,#3ea72d 0 18%,#fff300 18% 45%,#f18b00 45% 64%,#e53210 64% 82%,#b567a4 82%);position:relative}
-  .uvbar i{position:absolute;top:-3px;width:4px;height:12px;border-radius:3px;background:var(--ink);transform:translateX(-50%)}
-
-  /* Painel rotativo */
-  .rot{display:flex;flex-direction:column;min-height:0;padding-bottom:22px}
-  .tabs{display:flex;gap:6px;margin-bottom:18px}
-  .tab{flex:1;border:none;background:none;cursor:pointer;text-align:left;font:700 13px Figtree,sans-serif;text-transform:uppercase;letter-spacing:1.1px;color:#9aa39c;padding:0 0 10px;position:relative;white-space:nowrap}
-  .tab::before,.tab::after{content:"";position:absolute;left:0;bottom:0;height:4px;border-radius:4px}
-  .tab::before{right:0;background:#ece6d8}
-  .tab::after{width:0;background:var(--green)}
-  .tab.on{color:var(--ink)}
-  .tab.on::after{animation:prog var(--rot) linear forwards}
-  .tab.done::after{width:100%}
-  .rot.paused .tab.on::after{animation-play-state:paused}
-  @keyframes prog{to{width:100%}}
-  .panes{position:relative;flex:1;min-height:0}
-  .pane{position:absolute;inset:0;opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease;pointer-events:none;display:flex;flex-direction:column;gap:12px}
-  .pane.on{opacity:1;transform:none;pointer-events:auto}
-  .pane h3{font:600 26px Sora,sans-serif;letter-spacing:-.3px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-  .pane h3 small{font:500 15px Figtree,sans-serif;color:var(--muted)}
-
-  /* Hoje no campus */
-  .alert{display:flex;gap:14px;align-items:flex-start;padding:13px 16px;border-radius:16px;background:var(--green-l)}
-  .alert .dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--green);margin-top:7px}
-  .alert.hi{background:#fde6e4}.alert.hi .dot{background:var(--red)}
-  .alert.mid{background:var(--sun-l)}.alert.mid .dot{background:var(--sun)}
-  .alert.blue{background:var(--rain-l)}.alert.blue .dot{background:var(--rain)}
-  .alert b{display:block;font-size:19px}
-  .alert span{font-size:16px;color:#3d4a42}
-  .row2{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;margin-top:auto}
-  .tile{background:var(--soft);border-radius:16px;padding:12px 16px;font-size:15px;color:var(--muted)}
-  .tile b{display:block;font:600 24px Sora,sans-serif;color:var(--ink);margin-top:2px}
-  .tile.win{background:none;border:1.5px dashed #bcd6b9}
-  .tile.win b{color:var(--green-d);font-size:22px}
-
-  /* 7 dias (lista) */
-  .dlist{display:flex;flex-direction:column;flex:1;min-height:0;justify-content:space-between}
-  .drow{display:grid;grid-template-columns:110px 48px 70px 54px 1fr 54px;align-items:center;gap:12px;padding:4px 10px;border-radius:12px}
-  .drow.today{background:var(--green-l)}
-  .drow .n{font-weight:700;font-size:19px}
-  .drow .n small{display:block;font-weight:500;font-size:13px;color:var(--muted)}
-  .drow svg{width:46px;height:46px;display:block}
-  .drow .rp{font-size:15px;color:var(--rain);font-weight:700}
-  .drow .mn{font:400 21px Sora,sans-serif;color:var(--muted);text-align:right}
-  .drow .mx{font:600 21px Sora,sans-serif}
-  .range{height:7px;border-radius:7px;background:#eee8da;position:relative}
-  .range i{position:absolute;top:0;bottom:0;border-radius:7px;background:linear-gradient(90deg,#f6c25b,#e8711c)}
-
-  /* Oeste Potiguar */
-  .region{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:10px;flex:1;min-height:0}
-  .city{display:flex;align-items:center;gap:12px;padding:8px 14px;border-radius:14px;background:var(--soft)}
-  .city svg{width:46px;height:46px;flex:none}
-  .city .cn{font-size:17px;font-weight:600;flex:1}
-  .city .cr{font-size:13px;color:var(--muted);font-weight:500;display:block}
-  .city .ct{font:600 28px Sora,sans-serif}
-  .city.here{background:var(--green-l)}
-
-  /* Campo e lavoura */
-  .agro{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .agro .tile b{font-size:30px}
-  .agro .tile b small{font:500 15px Figtree,sans-serif;color:var(--muted);margin-left:3px}
-  .agro .tile em{font-style:normal;font-size:13px}
-  .balwrap{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--soft);border-radius:16px;padding:12px 16px 10px}
-  .balhead{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);font-weight:600}
-  .balhead i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 6px 0 14px;vertical-align:-1px}
-  .bal{flex:1;display:flex;align-items:flex-end;gap:14px;padding-top:10px;min-height:0}
-  .bal .col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;font-size:14px;color:var(--muted);font-weight:600}
-  .bal .bars{display:flex;gap:4px;align-items:flex-end;width:100%;justify-content:center;flex:1}
-  .bal .bars span{width:42%;border-radius:6px 6px 2px 2px;min-height:3px}
-  .agro-note{font-size:15px;color:#3d4a42}
-
-  /* Gráfico 24h */
-  .hourly{flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 28px 14px}
-  .hourly .hd{display:flex;justify-content:space-between;align-items:center;flex:none}
-  .legend{display:flex;gap:18px;font-size:14px;color:var(--muted);font-weight:600}
-  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-  #chart{flex:1;min-height:0;position:relative}
-  #chart svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-
-  footer{flex:none;display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:14px;padding:0 4px}
-  footer a{color:var(--green-d)}
-  .skeleton{opacity:.35}
-
-  /* ===== Telas estreitas (celular): rolagem normal ===== */
-  @media (max-width:899px) and (orientation:portrait){
-    #stage{padding:16px;gap:14px}
-    header{grid-template-columns:1fr auto;gap:12px}
-    .brand{grid-column:1/-1}.brand img{height:48px}
-    .clock{text-align:left}.clock .t{font-size:36px}.clock .d{font-size:14px}
-    .conn-sub{font-size:12px;text-align:right}
-    .top{grid-template-columns:1fr}
-    .now{gap:14px}.now .icon svg{width:110px;height:110px}
-    .now-temp{font-size:92px;letter-spacing:-3px}
-    .now-desc{font-size:21px}.now-sub{font-size:15px}
-    .stats{grid-template-columns:repeat(2,1fr)}
-    .stat .v{font-size:22px}
-    .rot{min-height:560px}
-    .tab{font-size:10px;letter-spacing:.5px;white-space:normal}
-    .drow{grid-template-columns:70px 40px 50px 42px 1fr 42px;gap:6px;padding:4px}
-    .drow .n{font-size:15px}.drow .mx,.drow .mn{font-size:17px}
-    .region{grid-template-columns:1fr}
-    .row2,.agro{grid-template-columns:1fr 1fr}
-    .hourly{min-height:280px}
-    #chart{overflow-x:auto}
-    footer{flex-direction:column;font-size:12px}
-  }
+/* Layout: faixa institucional no topo, trilha de etapas à esquerda, formulário em coluna de leitura à direita. */
+:root{
+  --bg:#f5f7f4; --surface:#ffffff; --sunk:#eaeee8; --line:#d3dacf; --fg:#1d261d; --muted:#5b6858;
+  --brand:#2f8a3c; --brand-ink:#ffffff; --brand-soft:#e2f0e1; --red:#c0272d; --warn:#9a6400; --warn-soft:#fbf0d9; --ok:#2f8a3c;
+  --f-display:"Literata", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo-cor{display:none} :root:not([data-theme="light"]) .logo-branca{display:block}}
+:root[data-theme="dark"] .logo-cor{display:none} :root[data-theme="dark"] .logo-branca{display:block}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121712; --surface:#1a211a; --sunk:#222b22; --line:#334033; --fg:#e4ebe2; --muted:#9caa98;
+  --brand:#5cbf69; --brand-ink:#0d150d; --brand-soft:#1f3321; --red:#ef6b6f; --warn:#e6b45a; --warn-soft:#33290f; --ok:#5cbf69; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121712; --surface:#1a211a; --sunk:#222b22; --line:#334033; --fg:#e4ebe2; --muted:#9caa98;
+  --brand:#5cbf69; --brand-ink:#0d150d; --brand-soft:#1f3321; --red:#ef6b6f; --warn:#e6b45a; --warn-soft:#33290f; --ok:#5cbf69; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .in{max-width:1180px;margin:0 auto;padding-block:12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.brandline{display:flex;gap:12px;align-items:center;min-width:0}
+.logo{height:56px;width:auto;flex:none}
+.logo-branca{display:none}
+.brandline > div{border-left:1px solid var(--line);padding-left:12px}
+.brandline h1{font-family:var(--f-display);font-weight:650;font-size:1.15rem;margin:0;line-height:1.2;text-wrap:balance}
+.brandline p{margin:0;color:var(--muted);font-size:.82rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;cursor:pointer;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:8px 14px;font-size:.92rem}
+button:hover{border-color:var(--brand)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid color-mix(in srgb,var(--brand) 55%,transparent);outline-offset:1px}
+button.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:700}
+button.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+button.ghost:hover{color:var(--fg)}
+button.danger{color:var(--red)}
+.layout{max-width:1180px;margin:0 auto;padding-block:24px 64px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:32px;align-items:start}
+nav.steps{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px)}
+nav.steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+nav.steps button{width:100%;text-align:left;border:0;background:transparent;display:grid;grid-template-columns:28px 1fr 12px;gap:8px;align-items:center;padding:7px 8px;border-radius:var(--r)}
+nav.steps button .n{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+nav.steps button .s{font-size:.82rem;color:var(--muted);display:block;line-height:1.2}
+nav.steps button[aria-current="step"]{background:var(--brand-soft)}
+nav.steps button[aria-current="step"] .t{font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line)}
+.dot.partial{border-color:var(--warn);background:linear-gradient(90deg,var(--warn) 50%,transparent 50%)}
+.dot.done{border-color:var(--ok);background:var(--ok)}
+.dot.na{border-style:dashed}
+main{min-width:0}
+.eyebrow{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin:0 0 4px}
+main h2{font-family:var(--f-display);font-weight:650;font-size:1.7rem;line-height:1.2;margin:0 0 8px;text-wrap:balance}
+.lead{color:var(--muted);max-width:68ch;margin:0 0 24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:18px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font-weight:700;font-size:.95rem}
+.field label .req{color:var(--red);font-weight:400}
+.help{color:var(--muted);font-size:.86rem;margin:0;max-width:72ch}
+input,textarea,select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;width:100%}
+textarea{resize:vertical;min-height:110px;line-height:1.55}
+input::placeholder,textarea::placeholder{color:color-mix(in srgb,var(--muted) 75%,transparent)}
+.counter{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);align-self:flex-end;font-variant-numeric:tabular-nums}
+.counter.bad{color:var(--warn)} .counter.good{color:var(--ok)}
+h3.sub{font-family:var(--f-display);font-weight:650;font-size:1.15rem;margin:0;display:flex;gap:10px;align-items:baseline}
+h3.sub .num{font-family:var(--f-mono);font-size:.85rem;color:var(--brand);font-weight:500}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.mod{position:relative;display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);cursor:pointer}
+.mod input{width:18px;height:18px;margin-top:3px;flex:none;accent-color:var(--brand)}
+.mod b{display:block}
+.mod small{color:var(--muted);display:block;font-size:.84rem;line-height:1.35;margin-top:2px}
+.mod .tag{font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.mod:has(input:checked){border-color:var(--brand);background:var(--brand-soft)}
+fieldset.modo{margin:0 0 16px;min-width:0;display:grid;gap:12px} fieldset.modo legend{float:left;width:100%;padding:0;margin:0 0 2px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table.ed{border-collapse:collapse;width:100%;min-width:560px}
+table.ed th{font-size:.8rem;text-align:left;color:var(--muted);font-weight:700;padding:8px;background:var(--sunk);border-bottom:1px solid var(--line)}
+table.ed td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}
+table.ed tr:last-child td{border-bottom:0}
+table.ed input,table.ed select,table.ed textarea{padding:6px 8px;font-size:.92rem}
+table.ed textarea{min-height:44px}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap}
+.xbtn{padding:4px 9px;color:var(--muted)}
+.note{background:var(--warn-soft);border-left:3px solid var(--warn);padding:10px 14px;border-radius:var(--r);font-size:.9rem}
+.note.info{background:var(--brand-soft);border-left-color:var(--brand)}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:24px;flex-wrap:wrap}
+.desc-item{border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.desc-head{display:flex;gap:10px;align-items:center}
+.desc-head .num{font-family:var(--f-mono);font-size:.85rem;color:var(--brand);flex:none}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:start;font-size:.95rem}
+.checks li::before{content:"";width:12px;height:12px;border-radius:50%;margin-top:5px;background:var(--ok)}
+.checks li.warn::before{background:var(--warn)}
+.checks li.miss::before{background:transparent;border:2px solid var(--red)}
+.outline{font-family:var(--f-display);font-size:.95rem;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+.outline li{display:grid;grid-template-columns:4.2em 1fr;gap:6px;align-items:baseline}
+.outline .num{font-family:var(--f-mono);font-size:.82rem;color:var(--muted)}
+.outline .l1{font-weight:650;text-transform:uppercase;font-size:.88rem;padding-top:6px}
+.outline .l2{text-transform:uppercase;font-size:.84rem}
+.outline .l3{font-size:.9rem}
+.confirm{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--r);padding:10px 14px;margin-bottom:16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:var(--r);font-size:.92rem;max-width:calc(100% - 32px);z-index:20}
+.saved{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+@media (max-width:860px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px;padding-top:12px}
+  nav.steps{position:static;overflow-x:auto;margin-inline:-4px}
+  nav.steps ol{flex-direction:row;gap:4px;padding:4px}
+  nav.steps button{grid-template-columns:auto auto;white-space:nowrap;padding:6px 10px;border:1px solid var(--line)}
+  nav.steps button .s{display:none}
+  nav.steps button .dot{display:none}
+  main h2{font-size:1.4rem}
+  header.top{position:static}
+  .logo{height:46px}
+  .saved{display:none}
+  .actions button{padding:7px 10px;font-size:.86rem}
+}
+@media (prefers-reduced-motion:no-preference){button,.mod{transition:border-color .15s,background-color .15s}}
 </style>
-</head>
-<body>
-<div id="diag" hidden></div>
-<div id="stage">
-  <header>
-    <div class="brand"><img src="data:image/png;base64,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" alt="Instituto Federal do Rio Grande do Norte — Campus Apodi"></div>
-    <div class="clock"><div class="t num" id="clk">--:--</div><div class="d" id="dte"></div></div>
-    <div class="conn">
-      <div class="status" id="status"><i></i><span id="statusTxt">Conectando…</span></div>
-      <div class="conn-sub" id="connSub">Fonte: Open-Meteo · atualiza a cada 15 min</div>
-    </div>
-  </header>
 
-  <section class="top">
-    <div class="card hero skeleton" id="hero">
-      <div class="now">
-        <div class="icon" id="nowIcon"></div>
-        <div>
-          <div class="now-temp num"><span id="nowT">--</span><sup>°C</sup></div>
-          <div class="now-desc" id="nowDesc">Carregando…</div>
-          <div class="now-sub" id="nowSub"></div>
-          <div class="chips" id="chips"></div>
-        </div>
-      </div>
-      <div class="stats" id="stats"></div>
+<header class="top wrap">
+  <div class="in">
+    <div class="brandline">
+      <img class="logo logo-cor" alt="Instituto Federal do Rio Grande do Norte" src="data:image/png;base64,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"><img class="logo logo-branca" alt="Instituto Federal do Rio Grande do Norte" src="data:image/png;base64,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">
+      <div><h1>Relatório de Prática Profissional</h1><p>IFRN · Cursos Técnicos Integrados · Resolução nº 25/2019-CONSUP</p></div>
     </div>
-
-    <div class="card rot" id="rot">
-      <div class="tabs" role="tablist">
-        <button class="tab" data-i="0">Hoje no campus</button>
-        <button class="tab" data-i="1">Próximos 7 dias</button>
-        <button class="tab" data-i="2">Oeste Potiguar</button>
-        <button class="tab" data-i="3">Campo e lavoura</button>
-      </div>
-      <div class="panes">
-        <div class="pane" id="pCampus">
-          <h3>Hoje no campus <small id="season"></small></h3>
-          <div id="alerts" style="display:flex;flex-direction:column;gap:10px"></div>
-          <div class="row2">
-            <div class="tile win">Melhor janela ao ar livre<b id="window">—</b></div>
-            <div class="tile">Nascer do sol<b class="num" id="sunrise">--:--</b></div>
-            <div class="tile">Pôr do sol<b class="num" id="sunset">--:--</b></div>
-          </div>
-        </div>
-        <div class="pane" id="pDays">
-          <h3>Próximos 7 dias <small>máx · mín · chuva</small></h3>
-          <div class="dlist" id="days"></div>
-        </div>
-        <div class="pane" id="pRegion">
-          <h3>Oeste Potiguar agora <small>máx / mín de hoje</small></h3>
-          <div class="region" id="region"></div>
-        </div>
-        <div class="pane" id="pAgro">
-          <h3>Campo e lavoura <small>próximos 7 dias</small></h3>
-          <div class="agro">
-            <div class="tile">Evapotranspiração hoje<b class="num" id="et0">--</b><em>ET₀ (FAO-56)</em></div>
-            <div class="tile">Chuva prevista<b class="num" id="rain7">--</b><em>soma de 7 dias</em></div>
-            <div class="tile">Balanço hídrico<b class="num" id="bal7">--</b><em>chuva − ET₀</em></div>
-          </div>
-          <div class="balwrap">
-            <div class="balhead"><span>Perda × reposição de água por dia</span><span><i style="background:#f0c27a"></i>ET₀<i style="background:#6fa8d8"></i>Chuva</span></div>
-            <div class="bal" id="balbars"></div>
-          </div>
-          <div class="agro-note" id="agroNote"></div>
-        </div>
-      </div>
+    <div class="actions">
+      <span class="saved" id="savedState"></span>
+      <button id="btnOpen" type="button">Abrir rascunho</button>
+      <button id="btnSave" type="button">Salvar rascunho</button>
+      <button id="btnDocx" type="button" class="primary">Gerar relatório (.docx)</button>
+      <input type="file" id="fileOpen" accept=".json,application/json" hidden>
     </div>
-  </section>
+  </div>
+</header>
 
-  <section class="card hourly">
-    <div class="hd">
-      <span class="label">Próximas 24 horas</span>
-      <span class="legend"><span><i style="background:#e8711c"></i>Temperatura</span><span><i style="background:#8fbbe0"></i>Chance de chuva</span></span>
-    </div>
-    <div id="chart"></div>
-  </section>
-
-  <footer>
-    <span>Dados: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) · atualização automática a cada 15 min · <span id="upd">—</span></span>
-    <span>Previsão detalhada: <a href="https://www.meteoblue.com/pt/tempo/semana/apodi_brasil_3407407" target="_blank" rel="noopener">meteoblue</a></span>
-  </footer>
+<div class="layout wrap">
+  <nav class="steps" aria-label="Etapas"><ol id="nav"></ol></nav>
+  <main id="main" tabindex="-1"></main>
 </div>
+<div class="toast" id="toast" hidden></div>
 
 <script>
-/* ===== Configuração ===== */
-const CAMPUS = { nome:"IFRN Campus Apodi", lat:-5.6480, lon:-37.8150 }; // RN-233, km 2 — Chapada do Apodi (aprox.)
-const TZ = "America/Fortaleza";
-const CIDADES = [
-  {n:"Apodi (sede)",    lat:-5.6646, lon:-37.7990, here:true},
-  {n:"Mossoró",         lat:-5.1878, lon:-37.3441},
-  {n:"Pau dos Ferros",  lat:-6.1092, lon:-38.2042},
-  {n:"Caraúbas",        lat:-5.7923, lon:-37.5566},
-  {n:"Felipe Guerra",   lat:-5.5925, lon:-37.6875},
-  {n:"Severiano Melo",  lat:-5.7767, lon:-37.9573},
-  {n:"Umarizal",        lat:-5.9822, lon:-37.8178},
-  {n:"Patu",            lat:-6.1066, lon:-37.6366},
-];
-let lastHourly=null, lastOk=null;
-const REFRESH_MIN = 15;     // atualização dos dados
-const ROTATE_SEC  = 14;     // tempo de cada quadro do painel rotativo
-const DESIGN_W = 1920, DESIGN_MIN_H = 1000; // tela de referência (Full HD)
-
-/* ===== Utilidades ===== */
-const $ = id => document.getElementById(id);
-const r0 = v => Math.round(v);
-const hhmm = iso => iso.slice(11,16);
-const WEEK = ["dom","seg","ter","qua","qui","sex","sáb"];
-const WEEKL = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
-const dateOf = iso => { const [y,m,d]=iso.slice(0,10).split("-").map(Number); return new Date(y,m-1,d); };
-const COMPASS = ["N","NNE","NE","ENE","L","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"];
-const compass = deg => COMPASS[Math.round(deg/22.5)%16];
-
-const WMO = {
-  0:"Céu limpo",1:"Predomínio de sol",2:"Parcialmente nublado",3:"Nublado",
-  45:"Nevoeiro",48:"Nevoeiro",51:"Garoa fraca",53:"Garoa",55:"Garoa forte",56:"Garoa",57:"Garoa",
-  61:"Chuva fraca",63:"Chuva moderada",65:"Chuva forte",66:"Chuva",67:"Chuva forte",
-  71:"Neve",73:"Neve",75:"Neve",77:"Neve",80:"Pancadas fracas",81:"Pancadas de chuva",82:"Pancadas fortes",
-  85:"Neve",86:"Neve",95:"Trovoadas",96:"Trovoadas com granizo",99:"Trovoadas com granizo"
+'use strict';
+/* ====================== CONTEÚDO NORMATIVO ====================== */
+const MODS = {
+  A:{nome:'Estágio', inciso:'art. 3º, I', ex:'Estágio obrigatório ou não obrigatório em empresa ou instituição concedente.',
+     sup:'Supervisor(a) do estágio', principal:'concedente',
+     campos:[{k:'tipo',l:'Tipo de estágio',type:'select',opts:['Não obrigatório','Obrigatório'],req:1},{k:'concedente',l:'Unidade concedente',ph:'Razão social, cidade/UF',req:1},{k:'supervisor',l:'Supervisor(a) na concedente',ph:'Nome, cargo ou formação',req:1},{k:'registro',l:'Termo de Compromisso / registro no SUAP',ph:'Nº do Termo de Compromisso'}],
+     secoes:[
+      ['Identificação da unidade concedente','Razão social, nome fantasia, CNPJ, endereço, ramo de atividade e porte. Informe se o estágio é obrigatório ou não obrigatório, conforme o PPC.'],
+      ['Histórico e área de atuação','Histórico resumido, produtos ou serviços, público atendido e relação da área de atuação com o seu curso.'],
+      ['Estrutura organizacional e setor do estágio','Estrutura da empresa, setor em que você atuou, equipe, equipamentos e normas de segurança. O organograma pode ser inserido depois no Word como figura.'],
+      ['Supervisão do estágio','Nome, formação e cargo do(a) supervisor(a) e como funcionou o acompanhamento no dia a dia.']],
+     res:'melhorias propostas ou implementadas, serviços executados, documentos técnicos elaborados',
+     docs:'Termo de Compromisso de Estágio; ficha de frequência; ficha de avaliação do(a) supervisor(a)'},
+  B:{nome:'Programa de aprendizagem', inciso:'art. 3º, II', ex:'Contrato de jovem aprendiz vinculado ao eixo tecnológico do curso.',
+     sup:'Empregado(a) monitor(a)', principal:'empresa',
+     campos:[{k:'empresa',l:'Empresa contratante',ph:'Razão social, cidade/UF',req:1},{k:'entidade',l:'Programa / entidade formadora',ph:'Nome do programa de aprendizagem'},{k:'monitor',l:'Empregado(a) monitor(a)',ph:'Nome, cargo',req:1},{k:'registro',l:'Contrato de aprendizagem / registro no SUAP',ph:'Nº ou data do contrato'}],
+     secoes:[
+      ['Identificação da empresa contratante','Razão social, CNPJ, endereço, ramo de atividade e porte.'],
+      ['Caracterização do programa de aprendizagem','Nome do programa, entidade formadora, período do contrato, jornada, distribuição entre teoria e prática e relação com o eixo tecnológico do curso.'],
+      ['Setor de atuação e acompanhamento','Setor em que você atuou e acompanhamento pelo(a) empregado(a) monitor(a): nome, cargo e forma de acompanhamento.']],
+     res:'atividades executadas no setor, rotinas e procedimentos aprendidos, contribuições à empresa',
+     docs:'Contrato de aprendizagem; declaração e avaliação do(a) empregado(a) monitor(a)'},
+  C:{nome:'Atividade profissional efetiva', inciso:'art. 3º, III', ex:'Emprego, cargo ou função, atividade autônoma, trainee, bolsa de iniciação profissional, estágio ou aprendizagem por outra instituição.',
+     sup:'Chefia imediata / responsável', principal:'organizacao',
+     campos:[{k:'tipo',l:'Tipo de vínculo',type:'select',req:1,opts:['Emprego privado','Emprego público','Cargo ou função','Atividade profissional autônoma','Programa de trainee','Programa de bolsas de iniciação profissional','Estágio por meio de outra instituição de ensino','Aprendizagem por meio de outra instituição de ensino']},{k:'organizacao',l:'Organização / empregador',ph:'Se autônomo(a), a sua área de atuação',req:1},{k:'cargo',l:'Cargo ou função',req:1},{k:'responsavel',l:'Chefia imediata ou responsável',ph:'Se houver'}],
+     secoes:[
+      ['Natureza do vínculo','Tipo de vínculo (emprego público ou privado; cargo ou função; atividade autônoma; programa de trainee; programa de bolsas de iniciação profissional; ou estágio ou aprendizagem por meio de outra instituição de ensino — art. 19), data de início e jornada.'],
+      ['Caracterização da organização ou da atividade autônoma','Organização em que você trabalha (ramo, porte, área). Se autônomo(a): serviços oferecidos, clientes e forma de atuação.'],
+      ['Cargo ou função e relação com o perfil profissional','Atribuições do cargo ou função e relação com o perfil profissional de conclusão do curso.']],
+     res:'serviços executados, problemas técnicos resolvidos, melhorias propostas',
+     docs:'Comprovação de vínculo (CTPS digital, contrato, termo de posse ou declaração do empregador); declaração de atividades e carga horária'},
+  D:{nome:'Empreendedorismo', inciso:'art. 3º, IV', ex:'MEI, empresa júnior, miniempresa, empresa incubada ou hotel de projeto.',
+     sup:'Responsável (incubadora / empresa júnior)', principal:'empreendimento',
+     campos:[{k:'tipo',l:'Tipo de empreendimento',type:'select',req:1,opts:['Microempreendedor(a) individual (MEI)','Empresa júnior','Miniempresa','Empresa incubada','Hotel de projeto']},{k:'empreendimento',l:'Nome do empreendimento',req:1},{k:'cnpj',l:'CNPJ / nº do CCMEI',ph:'Se houver'},{k:'entidade',l:'Incubadora, empresa júnior ou entidade responsável',ph:'Se houver'},{k:'funcao',l:'Sua função no empreendimento'}],
+     secoes:[
+      ['Tipo de empreendimento','MEI (Lei Complementar nº 128/2008), empresa júnior, miniempresa, empresa incubada ou hotel de projeto. CNPJ ou nº do CCMEI, entidade responsável e data de início.'],
+      ['Caracterização do empreendimento','Produtos ou serviços, público-alvo, mercado e concorrência, proposta de valor.'],
+      ['Modelo de negócio e gestão','Organização do empreendimento: estrutura, finanças, marketing, fornecedores e aspectos legais.'],
+      ['Papel do(a) estudante no empreendimento','Sua função e suas responsabilidades.']],
+     res:'indicadores do empreendimento (clientes, faturamento, produtos lançados), ações de gestão e lições aprendidas',
+     docs:'CCMEI ou cartão CNPJ; declaração da incubadora, empresa júnior, miniempresa ou hotel de projeto'},
+  E:{nome:'Projeto integrador, de pesquisa, extensão ou ensino', inciso:'art. 3º, V-a', ex:'Prática como componente curricular por meio de projeto.',
+     sup:'Coordenador(a) do projeto', principal:'titulo',
+     campos:[{k:'tipo',l:'Tipo de projeto',type:'select',req:1,opts:['Projeto integrador','Projeto de ensino','Projeto de pesquisa','Projeto de extensão']},{k:'titulo',l:'Título do projeto',req:1},{k:'edital',l:'Edital',ph:'Ex.: Edital nº 01/2026-PROEX',help:'Se houver.'},{k:'coordenador',l:'Coordenador(a) do projeto',req:1},{k:'condicao',l:'Sua participação',type:'select',opts:['Bolsista','Voluntário(a)','Integrante da equipe (projeto integrador)']},{k:'link',l:'Link do projeto no SUAP',ph:'https://suap.ifrn.edu.br/projetos/projeto/1072/',help:'Copie o endereço da página do projeto no SUAP. Se for projeto integrador sem registro, deixe em branco.'}],
+     secoes:[
+      ['Identificação do projeto','Tipo (integrador, de pesquisa, de extensão ou de ensino), título, edital (se houver), registro no SUAP, coordenador(a) e período. Se o projeto foi feito em equipe, deixe claro qual foi a sua parte. O projeto deve ter relação com as disciplinas do núcleo tecnológico (art. 27).'],
+      ['Problema e justificativa','Situação-problema ou demanda da comunidade e relevância do projeto.'],
+      ['Objetivos','Objetivo geral e objetivos específicos.'],
+      ['Fundamentação teórica','Conceitos e autores que fundamentam o projeto, com citações conforme a ABNT NBR 10520.'],
+      ['Metodologia','Tipo de estudo ou intervenção, etapas, materiais, instrumentos e procedimentos de coleta e análise.']],
+     res:'resultados e discussão em relação aos objetivos e ao referencial teórico; produtos gerados (protótipo, material, evento, publicação)',
+     docs:'Comprovante de registro do projeto no SUAP; declaração do(a) coordenador(a) do projeto'},
+  F:{nome:'TAL ou Programa de Apoio à Formação Estudantil', inciso:'art. 3º, VI', ex:'Tutoria de Aprendizagem e Laboratório, monitoria ou apoio em laboratório.',
+     sup:'Docente responsável', principal:'disciplina',
+     campos:[{k:'programa',l:'Programa e edital',ph:'Ex.: TAL – Edital nº 00/2026',req:1},{k:'condicao',l:'Sua participação',type:'select',opts:['Bolsista','Voluntário(a)']},{k:'disciplina',l:'Disciplina, laboratório ou setor atendido',req:1},{k:'docente',l:'Docente responsável',req:1}],
+     secoes:[
+      ['Identificação do programa','Programa, edital ou processo seletivo, condição (bolsista ou voluntário(a)), período e carga horária semanal.'],
+      ['Disciplina, laboratório ou setor atendido','Disciplina ou laboratório, docente responsável e recursos disponíveis.'],
+      ['Público atendido','Estudantes atendidos (turmas, quantidade, principais dificuldades) e horários de atendimento.']],
+     res:'número de atendimentos, materiais didáticos elaborados, evolução observada nos estudantes atendidos',
+     docs:'Termo de compromisso ou resultado do processo seletivo; declaração do(a) docente responsável; frequência'},
+  G:{nome:'Serviço voluntário', inciso:'art. 3º, X', ex:'Entidade pública ou instituição privada sem fins lucrativos (Lei nº 9.608/1998).',
+     sup:'Responsável na entidade', principal:'entidade',
+     campos:[{k:'entidade',l:'Entidade',ph:'Nome, cidade/UF',req:1},{k:'cnpj',l:'CNPJ da entidade'},{k:'responsavel',l:'Responsável pelo acompanhamento na entidade',ph:'Nome, função',req:1},{k:'adesao',l:'Data do Termo de Adesão',type:'date'}],
+     secoes:[
+      ['Identificação da entidade','Nome, CNPJ, endereço e finalidades (cívicas, culturais, educacionais, recreativas ou de assistência à pessoa). Data do Termo de Adesão.'],
+      ['Área de atuação e público atendido','Projetos ou ações da entidade em que você atuou e público beneficiado.'],
+      ['Responsável pelo acompanhamento na entidade','Nome e função de quem acompanhou as suas atividades.']],
+     res:'ações realizadas, número de pessoas beneficiadas e contribuição para a comunidade',
+     docs:'Termo de Adesão ao Serviço Voluntário; declaração da entidade com atividades e carga horária'},
 };
-const desc = (c,day) => (c<=1 && !day) ? (c===0?"Noite limpa":"Noite com poucas nuvens") : (WMO[c]||"—");
+const KEYS = Object.keys(MODS);
 
-/* ===== Ajuste à tela =====
-   Parâmetros opcionais no endereço:
-     ?margem=4   → reserva 4% de borda em cada lado (para TVs que cortam as bordas / overscan)
-     ?modo=tv    → força o modo tela única mesmo em telas pequenas
-   Teclas: F = tela cheia · D = diagnóstico · + / − = ajustar margem · 0 = zerar margem */
-const QS = new URLSearchParams(location.search);
-let MARGEM = parseFloat(QS.get("margem"));
-if(isNaN(MARGEM)){ try{ MARGEM = parseFloat(localStorage.getItem("margemTV")) || 0; }catch(e){ MARGEM = 0; } }
-const FORCE_TV = QS.get("modo")==="tv";
-let lastSize="";
-function viewport(){
-  const vv=window.visualViewport, de=document.documentElement;
-  const w=Math.round(vv?vv.width:(de.clientWidth||innerWidth));
-  const h=Math.round(vv?vv.height:(de.clientHeight||innerHeight));
-  return [w,h];
-}
-function fit(force){
-  const [w,h]=viewport(), key=w+"x"+h+"x"+MARGEM;
-  if(!force && key===lastSize) return;
-  lastSize=key;
-  const st=$("stage");
-  const mobile = !FORCE_TV && w<900 && h>w;          // só celular em pé usa rolagem
-  if(mobile){ document.documentElement.classList.remove("fit"); document.body.classList.remove("fit"); st.style.cssText=""; }
-  else{
-    document.documentElement.classList.add("fit"); document.body.classList.add("fit");
-    const mx=w*MARGEM/100, my=h*MARGEM/100, aw=w-2*mx, ah=h-2*my;
-    let sc=aw/DESIGN_W; if(ah/sc<DESIGN_MIN_H) sc=ah/DESIGN_MIN_H;
-    st.style.width=(aw/sc)+"px"; st.style.height=(ah/sc)+"px";
-    st.style.left=mx+"px"; st.style.top=my+"px";
-    st.style.transform=`scale(${sc})`;
-  }
-  if(lastHourly) renderChart(...lastHourly);
-  diag();
-}
-function diag(){
-  const el=$("diag"); if(!el||el.hidden) return;
-  const [w,h]=viewport();
-  el.textContent=`Área visível: ${w}×${h} px · tela: ${screen.width}×${screen.height} · zoom/DPR: ${devicePixelRatio} · margem: ${MARGEM}% · modo: ${document.body.classList.contains("fit")?"tela única":"rolagem"}`;
-}
-function setMargem(v){ MARGEM=Math.max(0,Math.min(10,Math.round(v*2)/2)); try{localStorage.setItem("margemTV",MARGEM);}catch(e){} fit(true); }
-["resize","orientationchange","pageshow","load","fullscreenchange","webkitfullscreenchange"].forEach(ev=>addEventListener(ev,()=>fit(true)));
-document.addEventListener("fullscreenchange",()=>fit(true));
-if(window.visualViewport) visualViewport.addEventListener("resize",()=>fit(true));
-if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>fit(true));
-setInterval(()=>fit(false),2000);   // vigia mudanças silenciosas de tamanho (comum em navegadores de TV)
-addEventListener("keydown",e=>{
-  const k=e.key.toLowerCase();
-  if(k==="f"){ const de=document.documentElement; (document.fullscreenElement? document.exitFullscreen() : (de.requestFullscreen||de.webkitRequestFullscreen).call(de))?.catch?.(()=>{}); }
-  else if(k==="d"){ const el=$("diag"); el.hidden=!el.hidden; diag(); }
-  else if(k==="+"||k==="="){ setMargem(MARGEM+0.5); }
-  else if(k==="-"){ setMargem(MARGEM-0.5); }
-  else if(k==="0"){ setMargem(0); }
+/* ====================== ESTADO ====================== */
+const blankState = () => ({
+  v:1, modo:'estudante',
+  modelo:{nDesc:3,nRef:2,nMet:2,exemplos:true,agradecimentos:false,dedicatoria:false,epigrafe:false,abstract:false,siglas:true,recado:''},
+  ident:{estudante:'',matricula:'',campus:'',curso:'',cidade:'',ano:String(new Date().getFullYear()),
+         titulo:'',subtitulo:'',area:'',orientador:'',coorientador:'',banca:false,dataDefesa:'',mesmoOrientador:'Sim',inicio:'',fim:'',ch:'',jornada:''},
+  mods:Object.fromEntries(KEYS.map(k=>[k,{on:false,inicio:'',fim:'',ch:'',orientador:'',...Object.fromEntries(MODS[k].campos.map(c=>[c.k, c.type==='select'?c.opts[0]:''])), ...(k==='E'?{equipe:[{nome:'',matricula:'',funcao:''}]}:{})}])),
+  carac:Object.fromEntries(KEYS.map(k=>[k,MODS[k].secoes.map(()=> '')])),
+  introducao:'', objetivos:'',
+  refIntro:'', ref:[], metIntro:'', met:[],
+  apendices:[], anexosExtra:[], estrutura:'', tabs:{},
+  plano:[{atividade:'',situacao:'Realizada',ch:'',obs:''}],
+  descricao:[{titulo:'',texto:''}],
+  resultados:'',
+  teoria:[{disciplina:'',aplicacao:''}],
+  teoriaTexto:'',
+  desafios:'',
+  examinadores:[{nome:'',instituicao:'Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte'},{nome:'',instituicao:'Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte'}],
+  figs:{}, anexos:false,
+  abstract:'',keywords:'',dedicatoria:'',epigrafe:'',epigrafeAutor:'',
+  consideracoes:'',
+  agradecimentos:'',resumo:'',palavras:'',
+  siglas:[{sigla:'IFRN',sig:'Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte'},{sigla:'PPC',sig:'Projeto Pedagógico de Curso'},{sigla:'SUAP',sig:'Sistema Unificado de Administração Pública'}],
+  referencias:'INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO RIO GRANDE DO NORTE. Conselho Superior. Resolução nº 25/2019-CONSUP, de 19 de junho de 2019. Aprova a atualização da Regulamentação da Prática Profissional Discente no âmbito do IFRN. Natal: IFRN, 2019.',
 });
-fit(true);
+let S = blankState();
+const LSKEY = 'ifrn-pp-rascunho-v1';
 
-/* ===== Ícones ===== */
-function iconInner(code, day=1){
-  const sun = (cx,cy,r)=>`<g stroke="#f0a011" stroke-width="3" stroke-linecap="round">${[...Array(8)].map((_,i)=>{const a=i*Math.PI/4;return `<line x1="${cx+Math.cos(a)*(r+5)}" y1="${cy+Math.sin(a)*(r+5)}" x2="${cx+Math.cos(a)*(r+10)}" y2="${cy+Math.sin(a)*(r+10)}"/>`}).join("")}</g><circle cx="${cx}" cy="${cy}" r="${r}" fill="#f7b52c"/>`;
-  const moon = (cx,cy,s)=>`<path transform="translate(${cx-16*s} ${cy-16*s}) scale(${s})" d="M22 3a14 14 0 1 0 9 20A12 12 0 0 1 22 3z" fill="#6c7fa8"/>`;
-  const cloud = (dx=0,dy=0,fill="#cfd8de",st="#b5c1c9")=>`<path transform="translate(${dx} ${dy})" d="M19 50h28a11 11 0 0 0 1-22 15 15 0 0 0-29-2 12 12 0 0 0 0 24z" fill="${fill}" stroke="${st}" stroke-width="1.5"/>`;
-  const drops = (n,col="#2b78b8")=>`<g stroke="${col}" stroke-width="3" stroke-linecap="round">${[...Array(n)].map((_,i)=>`<line x1="${24+i*9}" y1="54" x2="${21+i*9}" y2="61"/>`).join("")}</g>`;
-  if(code<=1) return day? sun(32,32,12) : moon(32,32,1.15);
-  if(code===2) return (day? sun(23,22,9) : moon(24,22,.75)) + cloud(4,6,"#e6ebee","#c3ccd2");
-  if(code===3) return cloud(-2,-2,"#d5dce1","#aeb9c1");
-  if(code===45||code===48) return cloud(-2,-8,"#dfe4e7","#c3ccd2")+`<g stroke="#9aa6ae" stroke-width="3" stroke-linecap="round"><line x1="12" y1="50" x2="52" y2="50"/><line x1="18" y1="57" x2="46" y2="57"/></g>`;
-  if(code>=51&&code<=57) return cloud(-2,-6)+drops(3,"#5b9bd0");
-  if(code>=95) return cloud(-2,-6,"#b8c2ca","#97a3ad")+`<path d="M34 42l-8 12h7l-4 10 11-14h-7l4-8z" fill="#f0a011"/>`;
-  if((code>=61&&code<=67)||(code>=80&&code<=82)) return cloud(-2,-6,"#c4cfd7","#a2afb9")+drops(code===65||code===82?4:3);
-  return cloud(-2,-2);
+function merge(base, data){ // mescla rascunho carregado sobre o modelo vazio
+  if(Array.isArray(base)) return Array.isArray(data)? data : base;
+  if(base && typeof base==='object'){ const o={...base}; if(data && typeof data==='object') for(const k in data){ o[k]= k in base? merge(base[k],data[k]) : data[k]; } return o; }
+  return (data===undefined||data===null)? base : (typeof base==='string'? String(data) : data);
 }
-const icon = (c,d=1) => `<svg viewBox="0 0 64 64" aria-hidden="true">${iconInner(c,d)}</svg>`;
+const getP=(p)=>p.split('.').reduce((o,k)=>o==null?o:o[k],S);
+const setP=(p,v)=>{const ks=p.split('.');let o=S;for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks[ks.length-1]]=v;};
+const filled=v=>typeof v==='string'? v.trim().length>0 : !!v;
+const sel=()=>KEYS.filter(k=>S.mods[k].on);
+const words=s=>(s.trim().match(/\S+/g)||[]).length;
 
-/* ===== Relógio ===== */
-function tick(){
-  const now=new Date();
-  $("clk").textContent = now.toLocaleTimeString("pt-BR",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});
-  const ds=now.toLocaleDateString("pt-BR",{timeZone:TZ,weekday:"long",day:"numeric",month:"long"});
-  $("dte").textContent = ds.charAt(0).toUpperCase()+ds.slice(1);
+/* ====================== ARMAZENAMENTO LOCAL ====================== */
+let saveT=null;
+function scheduleSave(){ clearTimeout(saveT); saveT=setTimeout(()=>{ try{ localStorage.setItem(LSKEY, JSON.stringify(S)); $('#savedState').textContent='rascunho salvo neste navegador'; }catch(e){ $('#savedState').textContent=''; } },500); }
+function migrate(d){ // rascunhos da primeira versão tinham local/supervisor/registro na identificação
+  if(d&&d.ident&&d.mods){ const I=d.ident; const A=d.mods.A||{}, B=d.mods.B||{};
+    if(A.on){ A.concedente=A.concedente||I.local||A.local||''; A.supervisor=A.supervisor||I.supervisor||''; A.registro=A.registro||I.registro||''; }
+    if(B.on){ B.empresa=B.empresa||I.local||B.local||''; B.monitor=B.monitor||I.supervisor||''; B.registro=B.registro||I.registro||''; }
+    delete I.local; delete I.supervisor; delete I.registro; }
+  if(d&&d.desafios===undefined&&(d.aprendizagens||d.dificuldades||d.etica)){ d.desafios=[d.dificuldades,d.aprendizagens,d.etica].filter(x=>x&&x.trim()).join('\n'); }
+  if(d){ delete d.aprendizagens; delete d.dificuldades; delete d.etica; }
+  if(d&&d.carac&&d.carac.E&&d.ref===undefined){ const split=txt=>{ const o={intro:[],subs:[]}; (txt||'').split(/\n/).forEach(l=>{ if(/^##\s*/.test(l.trim())) o.subs.push({titulo:l.trim().replace(/^##\s*/,''),texto:''}); else if(o.subs.length) o.subs[o.subs.length-1].texto+=(o.subs[o.subs.length-1].texto?'\n':'')+l; else o.intro.push(l); }); return o; };
+    const r=split(d.carac.E[3]), m=split(d.carac.E[4]); d.refIntro=r.intro.join('\n').trim(); d.ref=r.subs; d.metIntro=m.intro.join('\n').trim(); d.met=m.subs;
+    if(d.objetivos===undefined) d.objetivos=d.carac.E[2]||''; if(d.carac.E[0]&&!/\S/.test(d.introducao||'')) d.introducao=d.carac.E[0]; }
+  return d; }
+function loadLocal(){ try{ const raw=localStorage.getItem(LSKEY); if(raw){ S=merge(blankState(), migrate(JSON.parse(raw))); return true; } }catch(e){} return false; }
+
+/* ====================== UTILITÁRIOS DOM ====================== */
+const $=s=>document.querySelector(s);
+function h(tag, attrs={}, ...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(attrs||{})){
+    if(v==null||v===false) continue;
+    if(k==='class') e.className=v; else if(k==='text') e.textContent=v;
+    else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else e.setAttribute(k, v===true?'':v);
+  }
+  for(const c of kids.flat()){ if(c==null||c===false) continue; e.append(c.nodeType? c : document.createTextNode(String(c))); }
+  return e;
 }
-tick(); setInterval(tick,1000);
-
-/* ===== Painel rotativo ===== */
-const tabs=[...document.querySelectorAll(".tab")], panes=[...document.querySelectorAll(".pane")];
-let cur=0, timer=null, remaining=ROTATE_SEC*1000, startedAt=0, paused=false;
-document.documentElement.style.setProperty("--rot",ROTATE_SEC+"s");
-function show(i){
-  cur=(i+panes.length)%panes.length;
-  panes.forEach((p,k)=>p.classList.toggle("on",k===cur));
-  tabs.forEach((t,k)=>{t.classList.remove("on");t.classList.toggle("done",k<cur);});
-  void tabs[cur].offsetWidth; tabs[cur].classList.add("on");
-  remaining=ROTATE_SEC*1000; schedule();
+let uid=0;
+function bind(input, path, onChange){
+  input.value=getP(path)??'';
+  input.addEventListener('input',()=>{ setP(path, input.value); scheduleSave(); refreshNav(); onChange&&onChange(input.value); });
+  return input;
 }
-function schedule(){ clearTimeout(timer); if(paused) return; startedAt=Date.now(); timer=setTimeout(()=>show(cur+1),remaining); }
-tabs.forEach(t=>t.addEventListener("click",()=>show(+t.dataset.i)));
-const rot=$("rot");
-rot.addEventListener("mouseenter",()=>{paused=true;clearTimeout(timer);remaining-=Date.now()-startedAt;rot.classList.add("paused");});
-rot.addEventListener("mouseleave",()=>{paused=false;rot.classList.remove("paused");schedule();});
-show(0);
-
-/* ===== Serviço de meteorologia (Open-Meteo) ===== */
-const BASE = "https://api.open-meteo.com/v1/forecast";
-function urlCampus(){
-  const p = new URLSearchParams({
-    latitude:CAMPUS.lat, longitude:CAMPUS.lon, timezone:TZ, forecast_days:7,
-    current:"temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index",
-    hourly:"temperature_2m,precipitation_probability,precipitation,weather_code,uv_index,is_day,relative_humidity_2m",
-    daily:"weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,uv_index_max,sunrise,sunset,wind_speed_10m_max,et0_fao_evapotranspiration"
+function field({label, path, type='text', help, ph, rows, req, options, count, min, max}){
+  const id='f'+(++uid);
+  let inp;
+  if(type==='textarea') inp=h('textarea',{id,rows:rows||5,placeholder:ph});
+  else if(type==='select') inp=h('select',{id}, (options||[]).map(o=>h('option',{value:o,text:o})));
+  else inp=h('input',{id,type,placeholder:ph,min,max,inputmode:type==='number'?'numeric':null});
+  const counter = count? h('span',{class:'counter'}) : null;
+  const upd = v=>{ if(!counter) return; const n=words(v); counter.textContent=`${n} palavras${count.min?` · ideal ${count.min}–${count.max}`:''}`; counter.className='counter'+(count.min? (n>=count.min&&n<=count.max?' good':(n?' bad':'')):''); };
+  bind(inp,path,upd); upd(inp.value);
+  return h('div',{class:'field'},
+    h('label',{for:id}, label, req? h('span',{class:'req',text:' *'}):null),
+    help? h('p',{class:'help',text:help}):null, inp, counter);
+}
+function rowsEditor(path, cols, blank, opt={}){
+  const arr=getP(path);
+  const tb=h('tbody');
+  arr.forEach((row,i)=>{
+    tb.append(h('tr',{}, cols.map(c=>{
+      let inp;
+      if(c.type==='select') inp=h('select',{'aria-label':c.label}, c.options.map(o=>h('option',{value:o,text:o})));
+      else if(c.type==='textarea') inp=h('textarea',{'aria-label':c.label,rows:2,placeholder:c.ph||''});
+      else inp=h('input',{'aria-label':c.label,type:c.type||'text',placeholder:c.ph||'',inputmode:c.type==='number'?'numeric':null});
+      bind(inp, `${path}.${i}.${c.key}`);
+      return h('td',{style:c.w?`width:${c.w}`:null}, inp);
+    }), h('td',{style:'width:44px'}, h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover linha',title:'Remover linha',onclick:()=>{ arr.splice(i,1); if(!arr.length && !opt.empty) arr.push(blank()); scheduleSave(); render(); }},'✕'))));
   });
-  return `${BASE}?${p}`;
+  return h('div',{class:'stack',style:'gap:10px'},
+    arr.length? h('div',{class:'tablewrap'}, h('table',{class:'ed'}, h('thead',{}, h('tr',{}, cols.map(c=>h('th',{text:c.label})), h('th',{}))), tb)) : null,
+    h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ arr.push(blank()); scheduleSave(); render(); }},opt.add||'+ Adicionar linha')));
 }
-function urlRegiao(){
-  const p = new URLSearchParams({
-    latitude:CIDADES.map(c=>c.lat).join(","), longitude:CIDADES.map(c=>c.lon).join(","),
-    timezone:TZ, forecast_days:1, current:"temperature_2m,weather_code,is_day",
-    daily:"temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>t.hidden=true,3800); }
+
+/* ====================== TÍTULO SUGERIDO ====================== */
+const cap1=s=>s? s.charAt(0).toLocaleUpperCase('pt-BR')+s.slice(1) : s;
+const antesVirg=s=>(s||'').split(',')[0].trim();
+function sugestao(){
+  const ks=sel(); const k=ks[0]; const m=k?S.mods[k]:{}; const A=(S.ident.area||'').trim();
+  const f=(v,lab)=>filled(v)? v.trim() : `[${lab}]`; const area=f(A,'área');
+  let titulo='', subtitulo='';
+  if(ks.length>1){
+    const parte=k=>{ const m=S.mods[k]; switch(k){
+      case 'A': return `estágio na ${f(antesVirg(m.concedente),'concedente')}`;
+      case 'B': return `aprendizagem na ${f(antesVirg(m.empresa),'empresa')}`;
+      case 'C': return m.tipo==='Atividade profissional autônoma'? 'atuação autônoma' : `atuação como ${f(m.cargo,'cargo').toLocaleLowerCase('pt-BR')} na ${f(antesVirg(m.organizacao),'organização')}`;
+      case 'D': return `empreendimento ${f(m.empreendimento,'nome')}`;
+      case 'E': return `${(m.tipo||'projeto').toLocaleLowerCase('pt-BR')} “${f(m.titulo,'título do projeto')}”`;
+      case 'F': return `tutoria em ${f(m.disciplina,'disciplina')}`;
+      case 'G': return `serviço voluntário na ${f(antesVirg(m.entidade),'entidade')}`; } };
+    const ps=ks.map(parte);
+    return {titulo:cap1(f(A,'área comum')), subtitulo: ps.slice(0,-1).join(', ')+' e '+ps[ps.length-1]};
+  }
+  switch(k){
+    case 'A': titulo=`Estágio em ${area} na ${f(antesVirg(m.concedente),'concedente')}`; break;
+    case 'B': titulo=`Aprendizagem em ${area} na ${f(antesVirg(m.empresa),'empresa')}`; break;
+    case 'C': titulo= m.tipo==='Atividade profissional autônoma'? `Atuação autônoma em ${area}` : `Atuação como ${f(m.cargo,'cargo')} na ${f(antesVirg(m.organizacao),'organização')}`; break;
+    case 'D': titulo=`${f(m.empreendimento,'empreendimento')}`; subtitulo=A? cap1(A) : '[principal atuação]'; break;
+    case 'E': titulo=`${f(m.titulo,'título do projeto')}`; subtitulo=A? cap1(A) : '[principal atuação]'; break;
+    case 'F': titulo=`Tutoria de aprendizagem em ${f(m.disciplina,'disciplina')}`; subtitulo=A? cap1(A) : ''; break;
+    case 'G': titulo=`Serviço voluntário na ${f(antesVirg(m.entidade),'entidade')}`; subtitulo=A? cap1(A) : ''; break;
+    default: titulo='[escolha a modalidade]';
+  }
+  return {titulo:cap1(titulo), subtitulo};
+}
+function updSug(){ const el=document.getElementById('sugTitulo'); if(!el) return; const sg=sugestao(); el.textContent=sg.titulo+(sg.subtitulo?': '+sg.subtitulo:''); }
+document.addEventListener('input',updSug); document.addEventListener('change',updSug);
+function nomeMod(k){ // nome usado no relatório (projetos detalham o tipo)
+  if(k==='E'){ const tp=S.mods.E.tipo||'Projeto'; return `Prática como componente curricular (${tp.toLowerCase()})`; }
+  return MODS[k].nome;
+}
+const multiOri=()=>sel().length>1 && S.ident.mesmoOrientador==='Não';
+function orientadores(){ // [{nome, mods:[k]}] únicos, na ordem das modalidades
+  const ks=sel(); if(!multiOri()) return [{nome:(S.ident.orientador||'').trim(), mods:ks}];
+  const out=[]; ks.forEach(k=>{ const n=((S.mods[k].orientador||'')||S.ident.orientador||'').trim(); const f=out.find(o=>o.nome===n); if(f) f.mods.push(k); else out.push({nome:n,mods:[k]}); });
+  return out;
+}
+function clearButton(){
+  return h('button',{type:'button',class:'ghost danger',onclick:(e)=>{
+    const host=e.target.closest('.note, .rowbtns'); if(host.nextElementSibling&&host.nextElementSibling.classList.contains('confirm')) return;
+    const box=h('div',{class:'confirm'}, h('span',{text:'Apagar tudo o que foi preenchido? Se quiser guardar, use "Salvar rascunho" antes.'}),
+      h('button',{type:'button',class:'primary',onclick:()=>{ S=blankState(); try{localStorage.removeItem(LSKEY);}catch(_){} $('#savedState').textContent=''; go(0); toast('Relatório limpo.'); }},'Apagar tudo'),
+      h('button',{type:'button',onclick:()=>box.remove()},'Cancelar'));
+    host.after(box); }},'Limpar relatório');
+}
+
+/* ====================== FORMATO E NUMERAÇÃO DO RELATÓRIO ====================== */
+// Formato científico: projeto de ensino, pesquisa ou extensão como única modalidade.
+const sci=()=>{ const k=sel(); return k.length===1 && k[0]==='E' && /ensino|pesquisa|extens/i.test(S.mods.E.tipo||''); };
+const MOD=()=>S.modo==='modelo';
+const mo=k=>MOD()? !!S.modelo[k] : filled(S[k]); // elemento pré-textual opcional presente
+const blankItems=n=>Array.from({length:Math.max(0,parseInt(n,10)||0)},()=>({titulo:'',texto:''}));
+const descList=()=>MOD()? (blankItems(S.modelo.nDesc).length? blankItems(S.modelo.nDesc) : blankItems(1)) : S.descricao;
+const subList=k=>MOD()? blankItems(S.modelo[k==='ref'?'nRef':'nMet']) : S[k];
+const hasFigs=()=>MOD()? !!S.modelo.exemplos : allFigs();
+const hasTabs=()=>MOD()? !!S.modelo.exemplos : allTabs('Tabela');
+const hasSiglas=()=>MOD()? !!S.modelo.siglas : S.siglas.some(r=>filled(r.sigla));
+function estruturaSug(){ const N=secN(); return `Este relatório está organizado em ${N.consid} seções. Após esta introdução, a seção ${N.ref} apresenta o referencial teórico que fundamenta o projeto; a seção ${N.met} descreve a metodologia adotada; a seção ${N.ativ} apresenta e discute os resultados obtidos, os desafios e as aprendizagens, bem como a relação entre teoria e prática; e a seção ${N.consid} traz as considerações finais.`; }
+const allTabs=tipo=>Object.values(S.tabs||{}).some(a=>a.some(x=>filled(x.titulo)&&(!tipo||x.tipo===tipo)));
+function secN(){ return sci()? {intro:1,ref:2,met:3,ativ:4,consid:5} : {intro:1,carac:2,ativ:3,consid:4}; }
+const coorients=()=>(S.ident.coorientador||'').split(';').map(s=>s.trim()).filter(Boolean);
+const figsOf=k=>(S.figs&&S.figs[k]||[]).filter(f=>filled(f.titulo));
+const allFigs=()=>Object.values(S.figs||{}).some(a=>a.some(f=>filled(f.titulo)));
+function apAnLista(){
+  const L='ABCDEFGHIJKLMNOPQRSTUVWXYZ', out=[]; let a=0, x=0;
+  (S.apendices||[]).filter(r=>filled(r.titulo)||filled(r.descricao)).forEach(r=>out.push({tipo:'APÊNDICE',rotulo:'Apêndice '+L[a++],titulo:r.titulo,descricao:r.descricao}));
+  if(S.anexos){ out.push({tipo:'ANEXO',rotulo:'Anexo '+L[x++],titulo:'Plano de atividades deferido',padrao:'plano'}); out.push({tipo:'ANEXO',rotulo:'Anexo '+L[x++],titulo:'Documentos comprobatórios da prática profissional',padrao:'docs'}); }
+  (S.anexosExtra||[]).filter(r=>filled(r.titulo)||filled(r.descricao)).forEach(r=>out.push({tipo:'ANEXO',rotulo:'Anexo '+L[x++],titulo:r.titulo,descricao:r.descricao}));
+  return out;
+}
+// editor de subseções (título + texto + figuras), como os itens de atividades
+function subsEditor(path, num, figPrefix, phTitulo, phTexto){
+  const arr=getP(path);
+  return h('div',{class:'stack',style:'gap:12px'},
+    arr.map((d,i)=>h('div',{class:'desc-item'},
+      h('div',{class:'desc-head'}, h('span',{class:'num',text:`${num}.${i+1}`}), (()=>{const inp=h('input',{'aria-label':`Título da subseção ${num}.${i+1}`,placeholder:phTitulo}); bind(inp,`${path}.${i}.titulo`); return inp;})(),
+        h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover subseção',title:'Remover subseção',onclick:()=>{ arr.splice(i,1); for(let j=i;j<arr.length;j++) S.figs[figPrefix+j]=S.figs[figPrefix+(j+1)]||[]; delete S.figs[figPrefix+arr.length]; scheduleSave(); render(); }},'✕')),
+      (()=>{const ta=h('textarea',{'aria-label':`Texto da subseção ${num}.${i+1}`,rows:6,placeholder:phTexto}); bind(ta,`${path}.${i}.texto`); return ta;})(),
+      figEditor(figPrefix+i))),
+    h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ arr.push({titulo:'',texto:''}); scheduleSave(); render(); }},'+ Adicionar subseção')));
+}
+function caracOutline(){ // [{num, titulo, nivel, key, idx}]
+  const ks=sel(), out=[];
+  if(sci()) return out;
+  if(ks.length<=1){ const k=ks[0]; if(k) MODS[k].secoes.forEach(([t],i)=>out.push({num:`2.${i+1}`,titulo:t,nivel:2,key:k,idx:i})); }
+  else ks.forEach((k,j)=>{ out.push({num:`2.${j+1}`,titulo:nomeMod(k),nivel:2,key:k,head:true}); MODS[k].secoes.forEach(([t],i)=>out.push({num:`2.${j+1}.${i+1}`,titulo:t,nivel:3,key:k,idx:i})); });
+  return out;
+}
+function ativLabels(){ const n=secN().ativ; return sci()
+  ? {sec:`${n} RESULTADOS E DISCUSSÃO`, plano:`${n}.1 ATIVIDADES REALIZADAS`, desc:`${n}.2 RESULTADOS OBTIDOS`, res:`${n}.3 DISCUSSÃO DOS RESULTADOS`, des:`${n}.4 DESAFIOS E APRENDIZAGENS`, teo:`${n}.5 RELAÇÃO ENTRE TEORIA E PRÁTICA`, n}
+  : {sec:`${n} ATIVIDADES DESENVOLVIDAS E RESULTADOS`, plano:`${n}.1 PLANO DE ATIVIDADES E EXECUÇÃO`, desc:`${n}.2 DESCRIÇÃO DAS ATIVIDADES`, res:`${n}.3 RESULTADOS E PRODUTOS`, des:`${n}.4 DESAFIOS E APRENDIZAGENS`, teo:`${n}.5 RELAÇÃO ENTRE TEORIA E PRÁTICA`, n}; }
+function outline(){
+  const o=[], n=secN(), A=ativLabels();
+  const pre=['capa','folha de rosto', S.ident.banca?'folha de aprovação':'termo de validação'];
+  if(mo('dedicatoria')) pre.push('dedicatória'); if(mo('agradecimentos')) pre.push('agradecimentos'); if(mo('epigrafe')) pre.push('epígrafe');
+  pre.push('resumo'); if(mo('abstract')) pre.push('abstract'); if(hasFigs()) pre.push('lista de figuras'); pre.push('lista de quadros'); if(hasTabs()) pre.push('lista de tabelas'); if(hasSiglas()) pre.push('lista de siglas'); pre.push('sumário');
+  o.push(['', 'Pré-textuais: '+pre.join(', '),0]);
+  o.push(['1','Introdução',1]); if(sci()){ o.push(['1.1','Contextualização',2]); o.push(['1.2','Objetivos',2]); o.push(['1.3','Justificativa',2]); o.push(['1.4','Estrutura do relatório',2]); }
+  if(sci()){ o.push([String(n.ref),'Referencial teórico',1]); subList('ref').forEach((x,i)=>o.push([`${n.ref}.${i+1}`,x.titulo||'[Subseção]',2])); o.push([String(n.met),'Metodologia',1]); subList('met').forEach((x,i)=>o.push([`${n.met}.${i+1}`,x.titulo||'[Subseção]',2])); }
+  else { o.push(['2','Caracterização do contexto da prática profissional',1]); caracOutline().forEach(x=>o.push([x.num,x.titulo,x.nivel])); }
+  const AT = sci()? ['Resultados e discussão','Atividades realizadas','Resultados obtidos','Discussão dos resultados','Desafios e aprendizagens'] : ['Atividades desenvolvidas e resultados','Plano de atividades e execução','Descrição das atividades','Resultados e produtos','Desafios e aprendizagens'];
+  o.push([String(A.n),AT[0],1]); o.push([A.n+'.1',AT[1],2]); o.push([A.n+'.2',AT[2],2]);
+  descList().forEach((d,i)=>o.push([`${A.n}.2.${i+1}`, d.titulo||'[Atividade ou tema]',3]));
+  o.push([A.n+'.3',AT[3],2]); o.push([A.n+'.4',AT[4],2]); o.push([A.n+'.5','Relação entre teoria e prática',2]);
+  o.push([String(n.consid),'Considerações finais',1]);
+  o.push(['','Referências',1]);
+  apAnLista().forEach(x=>o.push(['',x.rotulo+' – '+(x.titulo||'[título]'),1]));
+  o.push(['','Formulário de identificação',1]);
+  return o;
+}
+
+/* ====================== ETAPAS ====================== */
+const identReq=['estudante','matricula','campus','curso','cidade','ano','orientador','inicio','fim','ch'];
+const STEPS=[
+  {t:'Identificação', s:'Capa, folha de rosto, orientação', st:()=>ratio(identReq.map(k=>S.ident[k])), r:stepIdent},
+  {t:'Modalidades e título', s:'Dados da prática · formulário de identificação', st:()=>{const k=sel(); if(!k.length) return 'empty'; return ratio([S.ident.titulo,...k.flatMap(x=>[...MODS[x].campos.filter(c=>c.req).map(c=>S.mods[x][c.k]), ...(k.length>1?[S.mods[x].ch,S.mods[x].inicio,S.mods[x].fim]:[])])]); }, r:stepMods},
+  {t:'Introdução', s:()=>sci()?'Seção 1 · contexto, objetivos, justificativa':'Seção 1', st:()=>ratio(sci()?[S.introducao,S.objetivos,S.carac.E[1],S.estrutura]:[S.introducao]), show:()=>!MOD(), r:stepIntro},
+  {t:()=>sci()?'Referencial teórico':'Caracterização', s:'Seção 2', st:()=>{const k=sel(); if(!k.length) return 'na'; if(sci()) return ratio([S.refIntro||S.ref.some(x=>filled(x.texto))]); return ratio(k.flatMap(x=>S.carac[x])); }, show:()=>!MOD(), r:stepCarac},
+  {t:'Metodologia', s:'Seção 3', show:()=>sci()&&!MOD(), st:()=>ratio([S.metIntro||S.met.some(x=>filled(x.texto))]), r:stepMet},
+  {t:()=>sci()?'Resultados e discussão':'Atividades e resultados', s:()=>'Seção '+secN().ativ, st:()=>ratio([S.plano.some(r=>filled(r.atividade)), S.descricao.some(d=>filled(d.texto)), S.resultados, S.desafios, S.teoria.some(r=>filled(r.disciplina))]), show:()=>!MOD(), r:stepAtiv},
+  {t:'Considerações finais', s:()=>'Seção '+secN().consid, st:()=>ratio([S.consideracoes]), show:()=>!MOD(), r:stepConsid},
+  {t:'Resumo e complementos', s:'Pré e pós-textuais', st:()=>ratio([S.resumo,S.palavras,S.referencias]), show:()=>!MOD(), r:stepResumo},
+  {t:'Estrutura do modelo', s:'Seções e elementos opcionais', show:()=>MOD(), st:()=>'na', r:stepModelo},
+  {t:'Revisar e gerar', s:()=>MOD()?'Conferência e modelo .docx':'Conferência e .docx', st:()=>'na', r:stepRevisar},
+];
+const val=x=>typeof x==='function'? x() : x;
+function ratio(vals){ const n=vals.filter(filled).length; return n===0?'empty': n===vals.length?'done':'partial'; }
+let cur=0;
+const vis=()=>STEPS.map((s,i)=>i).filter(i=>!STEPS[i].show||STEPS[i].show());
+function refreshNav(){
+  const ol=$('#nav'), V=vis(); ol.replaceChildren();
+  V.forEach((i,k)=>ol.append(h('li',{}, h('button',{type:'button','data-i':i,onclick:()=>go(i)}, h('span',{class:'n',text:String(k+1).padStart(2,'0')}), h('span',{}, h('span',{class:'t'}), h('span',{class:'s'})), h('span',{class:'dot'})))));
+  [...ol.querySelectorAll('button')].forEach(b=>{ const i=+b.dataset.i; b.querySelector('.t').textContent=val(STEPS[i].t); b.querySelector('.s').textContent=val(STEPS[i].s); b.toggleAttribute('aria-current',false); if(i===cur) b.setAttribute('aria-current','step'); const st=STEPS[i].st(); b.querySelector('.dot').className='dot '+(st==='empty'?'':st); b.title = st==='done'?'Completa':st==='partial'?'Incompleta':''; });
+}
+function go(i){ cur=i; render(); const m=$('#main'); m.focus({preventScroll:true}); window.scrollTo({top:0}); }
+function render(){
+  uid=0; const m=$('#main'); m.replaceChildren();
+  let V=vis(); if(!V.includes(cur)) cur=V.filter(i=>i<cur).pop()??0;
+  const s=STEPS[cur], k=V.indexOf(cur), prev=V[k-1], next=V[k+1];
+  m.append(...[].concat(s.r()).filter(Boolean));
+  const eb=m.querySelector('.eyebrow'); if(eb) eb.textContent=eb.textContent.replace(/^Etapa \d+/,'Etapa '+(k+1));
+  m.querySelectorAll('label').forEach(l=>{ if(!l.textContent.trim()) l.remove(); });
+  m.append(h('div',{class:'pager'},
+    prev!==undefined? h('button',{type:'button',onclick:()=>go(prev)},'← '+val(STEPS[prev].t)) : h('span'),
+    next!==undefined? h('button',{type:'button',class:'primary',onclick:()=>go(next)},val(STEPS[next].t)+' →') : h('span')));
+  refreshNav();
+  $('#btnDocx').textContent = MOD()? 'Gerar modelo (.docx)' : 'Gerar relatório (.docx)';
+}
+const head=(eyebrow,title,lead)=>[h('p',{class:'eyebrow',text:eyebrow}), h('h2',{text:title}), lead? h('p',{class:'lead',text:lead}):null];
+const checkbox=(id,label,path,onchange)=>{ const cb=h('input',{type:'checkbox',id}); cb.checked=!!getP(path); cb.addEventListener('change',()=>{ setP(path,cb.checked); scheduleSave(); onchange?onchange():render(); });
+  return h('label',{class:'mod',for:id,style:'max-width:640px'}, cb, h('span',{}, h('b',{text:label[0]}), label[1]? h('small',{text:label[1]}):null)); };
+function figEditor(key){
+  if(!S.figs) S.figs={}; if(!S.figs[key]) S.figs[key]=[];
+  return h('div',{class:'stack',style:'gap:8px'},
+    h('div',{class:'lbl',style:'font-size:.88rem',text:'Figuras desta parte (opcional)'}),
+    h('p',{class:'help',text:'Informe o título e a fonte de cada foto, gráfico ou esquema. O Word sai com o espaço reservado e a legenda ABNT numerada; depois é só colar a imagem.'}),
+    rowsEditor(`figs.${key}`,[{key:'titulo',label:'Título da figura',w:'60%',ph:'Ex.: Teste de densidade da gasolina'},{key:'fonte',label:'Fonte',ph:'Acervo próprio ('+(S.ident.ano||new Date().getFullYear())+')'}],()=>({titulo:'',fonte:''}),{empty:true,add:'+ Adicionar figura'}));
+}
+
+function tabEditor(key){
+  if(!S.tabs) S.tabs={}; if(!S.tabs[key]) S.tabs[key]=[];
+  return h('div',{class:'stack',style:'gap:8px'},
+    h('div',{class:'lbl',style:'font-size:.88rem',text:'Tabelas e quadros desta parte (opcional)'}),
+    h('p',{class:'help',text:'Tabela é para dados numéricos (bordas laterais abertas); quadro é para informações em texto (todas as bordas). Cole os dados com uma linha por linha da tabela e as colunas separadas por ponto e vírgula; a primeira linha é o cabeçalho. Se deixar os dados em branco, o Word sai com uma tabela vazia para você preencher.'}),
+    rowsEditor(`tabs.${key}`,[{key:'tipo',label:'Tipo',type:'select',options:['Tabela','Quadro'],w:'12%'},{key:'titulo',label:'Título',w:'28%',ph:'Ex.: Taxa de queima por formulação'},{key:'dados',label:'Dados (opcional)',type:'textarea',ph:'Amostra; Massa (g); Tempo (s)\n1; 23,3; 21\n2; 24,5; 21'},{key:'fonte',label:'Fonte',w:'18%',ph:'Autoria própria ('+(S.ident.ano||new Date().getFullYear())+')'}],()=>({tipo:'Tabela',titulo:'',dados:'',fonte:''}),{empty:true,add:'+ Adicionar tabela ou quadro'}));
+}
+function stepIdent(){
+  let confirmBox=null;
+  const banca = S.ident.banca? h('div',{class:'stack',style:'gap:12px'},
+      field({label:'Data da apresentação',path:'ident.dataDefesa',type:'date',help:'Opcional. Se ficar em branco, a folha sai com "Aprovado em: ___/___/____".'}),
+      h('div',{class:'lbl',text:'Examinadores(as)'}),
+      h('p',{class:'help',text:'O orientador(a) e o coorientador(a) entram na banca automaticamente. Informe aqui os demais membros.'}),
+      rowsEditor('examinadores',[{key:'nome',label:'Nome (com titulação)',w:'45%',ph:'Ex.: Prof. Me. Nome Sobrenome'},{key:'instituicao',label:'Instituição'}],()=>({nome:'',instituicao:'Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte'}),{add:'+ Adicionar examinador(a)'})) : null;
+  const modo=h('fieldset',{class:'card modo'}, h('legend',{class:'lbl',text:'Quem está usando o formulário?'}),
+    h('div',{class:'mods'}, [['estudante','Estudante','Vou escrever o meu relatório aqui e gerar o .docx no fim.'],['modelo','Professor(a) orientador(a)','Vou gerar um modelo em Word para o meu orientando, com a identificação preenchida e as orientações da modalidade dele.']].map(([v,b,sm])=>{
+      const r=h('input',{type:'radio',name:'modo',id:'modo_'+v,value:v}); r.checked=(S.modo||'estudante')===v;
+      r.addEventListener('change',()=>{ S.modo=v; scheduleSave(); render(); });
+      return h('label',{class:'mod',for:'modo_'+v}, r, h('span',{}, h('b',{text:b}), h('small',{text:sm}))); })),
+    MOD()? h('p',{class:'help',style:'margin:0',text:'Preencha os dados que você já tem (os que ficarem em branco saem destacados em amarelo para o estudante completar), escolha a modalidade e, na etapa Estrutura do modelo, as seções e os elementos opcionais. O estudante recebe só o arquivo .docx.'}) : null);
+  return [...head('Etapa 1 · Elementos pré-textuais','Identificação', MOD()? 'Estes dados preenchem a capa, a folha de rosto, o termo de validação (ou a folha de aprovação) e o formulário de identificação do modelo.' : 'Estes dados preenchem automaticamente a capa, a folha de rosto, o termo de validação (ou a folha de aprovação) e o formulário de identificação, no fim do relatório. Você digita uma vez só.'),
+    modo,
+    h('div',{class:'note info',style:'margin-bottom:16px'}, 'Quer ver como funciona antes? ', h('button',{type:'button',onclick:(e)=>{ if(confirmBox) return; confirmBox=h('div',{class:'confirm'}, h('span',{text:'Isso substitui o que estiver preenchido por um exemplo fictício. Continuar?'}), h('button',{type:'button',class:'primary',onclick:()=>{ S=merge(blankState(),EXEMPLO); scheduleSave(); render(); toast('Exemplo carregado. Lembre-se de substituir pelos seus dados.'); }},'Carregar exemplo'), h('button',{type:'button',onclick:()=>{confirmBox.remove();confirmBox=null;}},'Cancelar')); e.target.closest('.note').after(confirmBox); }},'Carregar exemplo fictício'), ' ', clearButton()),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Estudante e curso'}),
+        h('div',{class:'grid2'},
+          field({label:'Nome completo',path:'ident.estudante',req:1,ph:'Como consta no SUAP'}),
+          field({label:'Matrícula',path:'ident.matricula',req:1}),
+          field({label:'Campus',path:'ident.campus',req:1,ph:'Ex.: Natal-Central'}),
+          field({label:'Curso',path:'ident.curso',req:1,ph:'Ex.: Edificações',help:'Só o nome. O texto "Técnico de Nível Médio em … na forma Integrada" é montado automaticamente.'}),
+          field({label:'Cidade',path:'ident.cidade',req:1}),
+          field({label:'Ano de entrega',path:'ident.ano',req:1,type:'number'}))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Orientação'}),
+        h('div',{class:'grid2'},
+          field({label:'Orientador(a)',path:'ident.orientador',req:1,ph:'Nome completo',help:'Docente do IFRN em exercício no seu campus (art. 5º). Na prática combinada com orientadores diferentes, este é o orientador da primeira atividade; os demais são informados na etapa Modalidades.'}),
+          field({label:'Coorientador(a)',path:'ident.coorientador',ph:'Nome completo',help:'Opcional. Se houver mais de um, separe os nomes com ponto e vírgula.'})),
+        checkbox('chkBanca',['Houve apresentação pública com banca examinadora','A apresentação é facultativa (art. 6º, § 2º). Marque se ela aconteceu: o relatório sai com a folha de aprovação da banca no lugar do termo de validação.'],'ident.banca'),
+        banca),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Período e carga horária'}),
+        h('p',{class:'help',text:'Se a prática for combinada, informe o período e a carga horária totais. A divisão por modalidade é feita na próxima etapa.'}),
+        h('div',{class:'grid2'},
+          field({label:'Início',path:'ident.inicio',type:'date',req:1}),
+          field({label:'Término',path:'ident.fim',type:'date',req:1}),
+          field({label:'Carga horária total (h)',path:'ident.ch',type:'number',req:1,min:0,help:'Conforme a carga horária de prática profissional definida no PPC do seu curso.'}),
+          field({label:'Jornada semanal (h)',path:'ident.jornada',type:'number',min:0})))
+    )];
+}
+
+function stepMods(){
+  const list=h('div',{class:'mods'}, KEYS.map(k=>{
+    const cb=h('input',{type:'checkbox',id:'mod'+k});
+    cb.checked=S.mods[k].on;
+    cb.addEventListener('change',()=>{ S.mods[k].on=cb.checked; scheduleSave(); render(); });
+    return h('label',{class:'mod',for:'mod'+k}, cb, h('span',{}, h('span',{class:'tag',text:`Bloco ${k} · ${MODS[k].inciso}`}), h('b',{text:MODS[k].nome}), h('small',{text:MODS[k].ex})));
+  }));
+  const ks=sel(); const out=[...head('Etapa 2 · Art. 3º da Resolução 25/2019','Modalidades e título','Marque a modalidade da sua prática e preencha os dados dela. Se você combinou mais de uma (art. 3º, caput), marque todas: cada uma ganha os seus próprios dados, uma subseção de caracterização e uma linha no formulário de identificação, com a carga horária de cada atividade.'), list];
+  if(ks.length){
+    out.push(h('div',{class:'stack',style:'margin-top:20px'}, ks.map(k=>h('div',{class:'card'},
+      h('h3',{class:'sub'}, h('span',{class:'num',text:'Bloco '+k}), 'Dados – '+MODS[k].nome),
+      h('div',{class:'grid2'}, MODS[k].campos.map(c=>field({label:c.l,path:`mods.${k}.${c.k}`,type:c.type||'text',options:c.opts,ph:c.ph,help:c.help,req:c.req}))),
+      k==='E'? h('div',{class:'stack',style:'gap:8px'}, h('div',{class:'lbl',text:'Demais integrantes da equipe'}),
+        h('p',{class:'help',text:'Opcional. Se o projeto foi feito em equipe, liste os colegas (você já está identificado). O relatório continua individual: descreva nas próximas etapas a sua participação e a sua análise.'}),
+        rowsEditor('mods.E.equipe',[{key:'nome',label:'Nome',w:'42%'},{key:'matricula',label:'Matrícula',w:'22%'},{key:'funcao',label:'Função no projeto',ph:'Ex.: bolsista, voluntário(a)'}],()=>({nome:'',matricula:'',funcao:''}))) : null,
+      ks.length>1? h('div',{class:'grid2'}, field({label:'Início',path:`mods.${k}.inicio`,type:'date'}), field({label:'Término',path:`mods.${k}.fim`,type:'date'}), field({label:'Carga horária desta atividade (h)',path:`mods.${k}.ch`,type:'number',min:0}),
+        multiOri()? field({label:'Orientador(a) desta atividade',path:`mods.${k}.orientador`,req:1,ph:S.ident.orientador||'Nome completo',help:'Se ficar em branco, vale o orientador(a) informado na Identificação.'}) : null) : null))));
+  }
+  if(ks.length>1){
+    const q=h('select',{id:'mesmoOri'}, ['Sim','Não'].map(o=>h('option',{value:o,text:o}))); q.value=S.ident.mesmoOrientador||'Sim';
+    q.addEventListener('change',()=>{ S.ident.mesmoOrientador=q.value; scheduleSave(); render(); });
+    out.splice(4,0,h('div',{class:'card',style:'margin-top:20px'}, h('div',{class:'field'}, h('label',{for:'mesmoOri',text:'As atividades têm o mesmo orientador(a)?'}),
+      h('p',{class:'help',text:'Se não, cada atividade recebe o seu orientador(a), e cada um assina o Termo de Validação e avalia a sua atividade (art. 6º, § 1º).'}), q)));
+    const soma=ks.reduce((a,k)=>a+(+S.mods[k].ch||0),0);
+    const tot=+S.ident.ch||0;
+    out.push(h('div',{class:'note info',style:'margin-top:16px',text:'Prática combinada: a nota final é a média ponderada pela carga horária de cada atividade, e você precisa de pelo menos 60 pontos em cada uma (art. 6º, § 1º).'}));
+    if(tot && soma && soma!==tot) out.push(h('div',{class:'note',style:'margin-top:10px',text:`A soma das cargas horárias (${soma} h) é diferente da carga horária total informada na identificação (${tot} h).`}));
+  }
+  if(ks.length){
+    const sugEl=h('b',{id:'sugTitulo'});
+    out.push(h('div',{class:'card',style:'margin-top:20px'}, h('h3',{class:'sub',text:'Título do relatório'}),
+      h('p',{class:'help',text:'O título identifica a sua experiência e segue um padrão por modalidade. Informe a sua área ou principal atuação e use a sugestão como ponto de partida; você pode editar depois.'}),
+      field({label:ks.length>1?'Área comum às atividades':'Área ou principal atuação',path:'ident.area',help:ks.length>1?'Na prática combinada, o título é temático: a área que une as atividades. O subtítulo lista as modalidades.':null,ph:ks.length>1?'Ex.: gerenciamento e manutenção de edificações':ks[0]==='E'?'Ex.: levantamento de patologias nas escolas da zona norte':'Ex.: gerenciamento de obras residenciais'}),
+      h('div',{class:'note info',style:'display:flex;flex-wrap:wrap;gap:10px;align-items:center'}, h('span',{}, 'Sugestão: ', sugEl), h('button',{type:'button',onclick:()=>{ const sg=sugestao(); S.ident.titulo=sg.titulo; S.ident.subtitulo=sg.subtitulo; scheduleSave(); render(); toast('Título preenchido. Ajuste se quiser.'); }},'Usar sugestão')),
+      h('div',{class:'grid2'},
+        field({label:'Título do relatório',path:'ident.titulo',req:1}),
+        field({label:'Subtítulo',path:'ident.subtitulo',help:'Opcional.'}))));
+    setTimeout(updSug);
+  }
+  if(!ks.length) out.push(h('p',{class:'help',style:'margin-top:16px',text:'Modalidades exclusivas de licenciaturas e de cursos superiores (art. 3º, V-b a V-d, VII, VIII e IX) não se aplicam aos cursos técnicos integrados.'}));
+  return out;
+}
+
+function stepIntro(){
+  const n=secN(), S1=sci();
+  if(!S1) return [...head(`Etapa 3 · Seção ${n.intro}`,'Introdução','Muita gente escreve a introdução por último, depois de descrever as atividades. Você pode pular esta etapa e voltar no fim.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, field({label:'Texto da introdução',path:'introducao',type:'textarea',rows:12,count:{},help:'Apresente o contexto da prática (modalidade, local, período e carga horária), o objetivo geral e os objetivos específicos, conforme o Plano de Atividades, e a importância da prática para a sua formação e para o perfil profissional de conclusão do curso (PPC). No último parágrafo, diga o que cada seção do relatório traz. Separe os parágrafos com uma linha em branco.'})),
+      filled(S.objetivos)? h('div',{class:'card'}, field({label:'Objetivos',path:'objetivos',type:'textarea',rows:4,help:'Este texto vem de uma versão anterior do rascunho e entra no fim da introdução. Se preferir, mova-o para o texto acima e apague este campo.'})) : null)];
+  return [...head(`Etapa 3 · Seção ${n.intro}`,'Introdução','No formato científico, a introdução traz a contextualização do tema, os objetivos e a justificativa do projeto. Muita gente escreve esta parte por último.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, field({label:`${n.intro}.1 Contextualização`,path:'introducao',type:'textarea',rows:10,count:{},help:'Apresente o tema e o problema ou a demanda que originou o projeto, com apoio da literatura (citações conforme a NBR 10520). Apresente também o projeto: tipo, edital, coordenação, período e, se for o caso, a equipe e a sua parte nela.'})),
+      h('div',{class:'card'}, field({label:`${n.intro}.2 Objetivos`,path:'objetivos',type:'textarea',rows:6,help:'Escreva o objetivo geral e, em seguida, os objetivos específicos (um por linha).'})),
+      h('div',{class:'card'}, field({label:`${n.intro}.3 Justificativa`,path:'carac.E.1',type:'textarea',rows:6,help:'Explique a relevância do projeto para a comunidade, para a área técnica e para a sua formação.'})),
+      h('div',{class:'card'}, field({label:`${n.intro}.4 Estrutura do relatório`,path:'estrutura',type:'textarea',rows:5,help:'Diga, em um parágrafo, o que cada seção do relatório apresenta.'}),
+        h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ S.estrutura=estruturaSug(); scheduleSave(); render(); toast('Texto sugerido. Ajuste se quiser.'); }},'Sugerir texto a partir da estrutura'))))];
+}
+
+function stepCarac(){
+  const ks=sel(), n=secN();
+  if(!ks.length) return [...head('Etapa 4 · Seção 2','Caracterização do contexto'), h('div',{class:'note'}, 'Escolha a sua modalidade na etapa 2 para ver os campos desta seção. ', h('button',{type:'button',onclick:()=>go(1)},'Ir para Modalidades'))];
+  if(sci()) return [...head(`Etapa 4 · Seção ${n.ref}`,'Referencial teórico','Conceitos, autores e estudos que fundamentam o projeto. Use subseções quando o tema tiver partes distintas.'),
+    h('div',{class:'card'},
+      field({label:'Texto de abertura',path:'refIntro',type:'textarea',rows:6,help:'Citações conforme a NBR 10520. Se usar subseções, este texto é opcional e apresenta o que vem a seguir.'}),
+      figEditor('ref'),
+      subsEditor('ref', n.ref, 'ref_', 'Título da subseção (ex.: Automação na avicultura)', 'Texto da subseção, com citações.'))];
+  const ol=caracOutline();
+  const cards=[]; let card=null;
+  ol.forEach(x=>{
+    if(x.head){ card=h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:x.num}), x.titulo)); cards.push(card); return; }
+    if(ks.length===1 && !card){ card=h('div',{class:'card'}); cards.push(card); }
+    card.append(h('div',{class:'stack',style:'gap:6px'}, h('div',{class:'lbl'}, h('span',{style:'font-family:var(--f-mono);color:var(--brand);font-weight:500;margin-right:8px',text:x.num}), x.titulo),
+      field({label:'',path:`carac.${x.key}.${x.idx}`,type:'textarea',rows:5,help:MODS[x.key].secoes[x.idx][1]}),
+      x.idx===MODS[x.key].secoes.length-1? figEditor(`carac_${x.key}`) : null));
   });
-  return `${BASE}?${p}`;
-}
-async function getJSON(u){
-  const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),12000);
-  try{ const r=await fetch(u,{signal:ctl.signal}); if(!r.ok) throw new Error("HTTP "+r.status); return await r.json(); }
-  finally{ clearTimeout(t); }
+  return [...head('Etapa 4 · Seção 2','Caracterização do contexto','Apresente o lugar, o projeto ou o empreendimento em que a prática aconteceu. Os campos mudam conforme a modalidade escolhida.'), h('div',{class:'stack'}, cards)];
 }
 
-/* ===== Renderização ===== */
-function renderCampus(d){
-  const c=d.current, h=d.hourly, dl=d.daily;
-  let i0=h.time.indexOf(c.time.slice(0,13)+":00"); if(i0<0) i0=0;
-  const day=c.is_day===1;
+function stepMet(){
+  const n=secN();
+  return [...head(`Etapa 5 · Seção ${n.met}`,'Metodologia','Como o projeto foi conduzido. Use subseções para as etapas ou procedimentos.'),
+    h('div',{class:'card'},
+      field({label:'Texto de abertura',path:'metIntro',type:'textarea',rows:6,help:'Tipo de estudo ou de intervenção, local, etapas, materiais e equipamentos, instrumentos e procedimentos de coleta e análise dos dados.'}),
+      figEditor('met'),
+      subsEditor('met', n.met, 'met_', 'Título da subseção (ex.: Preparo das amostras)', 'Descrição desta etapa ou procedimento.'))];
+}
+function stepAtiv(){
+  const ks=sel(), A=ativLabels(), N=A.n, S1=sci();
+  const resHelp = S1? 'Discuta os resultados: compare-os com os objetivos e com o referencial teórico, aponte limitações e possibilidades de continuidade.'
+    : ks.length? 'Apresente o que foi produzido ou alcançado. Para a sua modalidade: '+ks.map(k=>`${MODS[k].nome.toLowerCase()} — ${MODS[k].res}`).join('; ')+'.' : 'Apresente o que foi produzido ou alcançado.';
+  const desc=h('div',{class:'stack',style:'gap:12px'}, S.descricao.map((d,i)=>h('div',{class:'desc-item'},
+    h('div',{class:'desc-head'}, h('span',{class:'num',text:`${N}.2.${i+1}`}), (()=>{const inp=h('input',{'aria-label':`Título do item ${N}.2.${i+1}`,placeholder:S1?'Título do resultado ou etapa':'Título da atividade ou tema'}); bind(inp,`descricao.${i}.titulo`); return inp;})(),
+      h('button',{type:'button',class:'xbtn ghost','aria-label':'Remover item',title:'Remover item',onclick:()=>{ S.descricao.splice(i,1); for(let j=i;j<S.descricao.length;j++){ S.figs['desc_'+j]=S.figs['desc_'+(j+1)]||[]; if(S.tabs) S.tabs['desc_'+j]=S.tabs['desc_'+(j+1)]||[]; } delete S.figs['desc_'+S.descricao.length]; if(S.tabs) delete S.tabs['desc_'+S.descricao.length]; if(!S.descricao.length) S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'✕')),
+    (()=>{const ta=h('textarea',{'aria-label':`Texto do item ${N}.2.${i+1}`,rows:6,placeholder:S1?'O que foi obtido nesta etapa, com dados, medições ou produtos, e qual foi a sua participação.':'O que foi feito, como, com quais ferramentas, equipamentos, softwares ou normas técnicas, e qual foi a sua participação.'}); bind(ta,`descricao.${i}.texto`); return ta;})(),
+    (()=>{const ta=h('textarea',{'aria-label':`Conhecimentos do curso aplicados no item ${N}.2.${i+1}`,rows:2,placeholder:'Conhecimentos do curso aplicados (opcional). Ex.: Os conteúdos de Desenho Técnico foram essenciais para interpretar as pranchas do projeto.'}); bind(ta,`descricao.${i}.conhecimentos`); return ta;})(),
+    figEditor('desc_'+i), tabEditor('desc_'+i))));
+  return [...head(`Etapa 5 · Seção ${N}`, S1?'Resultados e discussão':'Atividades desenvolvidas e resultados', 'Aqui entram também os desafios e as aprendizagens da experiência.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.1`}), S1?'Atividades realizadas':'Plano de atividades e execução'),
+        h('p',{class:'help',text:'Liste as atividades do Plano de Atividades deferido (art. 4º, IV) e o que aconteceu com cada uma. Se alguma não foi realizada ou mudou, explique em Observações. Vira um quadro no relatório.'}),
+        rowsEditor('plano',[{key:'atividade',label:'Atividade prevista no Plano',type:'textarea',w:'40%'},{key:'situacao',label:'Situação',type:'select',options:['Realizada','Realizada parcialmente','Não realizada'],w:'18%'},{key:'ch',label:'CH (h)',type:'number',w:'11%'},{key:'obs',label:'Observações',type:'textarea'}],()=>({atividade:'',situacao:'Realizada',ch:'',obs:''}))),
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.2`}), S1?'Resultados obtidos':'Descrição das atividades'),
+        h('p',{class:'help',text:S1?'Crie um item para cada resultado ou etapa do projeto. Não exponha pessoas ou dados sigilosos sem autorização.':'Crie um item para cada atividade ou tema, em ordem cronológica ou temática. Não exponha pessoas ou dados sigilosos sem autorização.'}),
+        desc, h('div',{class:'rowbtns'}, h('button',{type:'button',onclick:()=>{ S.descricao.push({titulo:'',texto:''}); scheduleSave(); render(); }},'+ Adicionar item'))),
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.3`}), S1?'Discussão dos resultados':'Resultados e produtos'),
+        field({label:'',path:'resultados',type:'textarea',rows:7,help:resHelp}), figEditor('resultados'), tabEditor('resultados')),
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.4`}),'Desafios e aprendizagens'),
+        field({label:'',path:'desafios',type:'textarea',rows:8,help:'Dificuldades encontradas e como foram resolvidas; competências técnicas e de relacionamento desenvolvidas (comunicação, trabalho em equipe, autonomia); cuidados com ética, sigilo, saúde e segurança.'})),
+      h('div',{class:'card'}, h('h3',{class:'sub'}, h('span',{class:'num',text:`${N}.5`}),'Relação entre teoria e prática'),
+        h('p',{class:'help',text:'A articulação entre teoria e prática é o fundamento da prática profissional no IFRN (art. 2º). Além do campo "Conhecimentos do curso aplicados" em cada item, sintetize aqui as disciplinas e os conhecimentos usados, incluindo os que você precisou aprender fora do currículo. Vira um quadro-síntese no relatório.'}),
+        rowsEditor('teoria',[{key:'disciplina',label:'Disciplina / conhecimento',w:'35%',ph:'Ex.: Topografia'},{key:'aplicacao',label:'Como foi aplicado na prática',type:'textarea'}],()=>({disciplina:'',aplicacao:''})),
+        field({label:'Comentário (opcional)',path:'teoriaTexto',type:'textarea',rows:4,help:'Em que a formação ajudou, o que faltou e como você buscou esse conhecimento.'})))];
+}
 
-  $("hero").classList.remove("skeleton");
-  $("nowIcon").innerHTML=icon(c.weather_code,day);
-  $("nowT").textContent=r0(c.temperature_2m);
-  $("nowDesc").textContent=desc(c.weather_code,day);
-  $("nowSub").innerHTML=`Sensação de <b>${r0(c.apparent_temperature)}°</b> · Máx <b>${r0(dl.temperature_2m_max[0])}°</b> · Mín <b>${r0(dl.temperature_2m_min[0])}°</b>`;
+function stepConsid(){
+  const n=secN();
+  return [...head(`Etapa 6 · Seção ${n.consid}`,'Considerações finais'),
+    h('div',{class:'card'}, field({label:'Texto das considerações finais',path:'consideracoes',type:'textarea',rows:10,count:{},help:'Retome os objetivos da introdução e diga se foram alcançados. Faça um balanço da contribuição da prática para a sua formação e para os seus planos profissionais. Apresente sugestões para a unidade concedente, o projeto ou o curso e, se for o caso, propostas de continuidade.'}))];
+}
+function stepResumo(){
+  return [...head('Etapa 7 · Pré e pós-textuais','Resumo e complementos','Escreva o resumo por último, quando o resto do relatório estiver pronto. Os elementos opcionais só entram no relatório se forem preenchidos.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'},
+        field({label:'Resumo',path:'resumo',type:'textarea',rows:9,req:1,count:{min:150,max:250},help:'Parágrafo único, voz ativa, terceira pessoa do singular. Informe a modalidade, o local e o período, o objetivo, as principais atividades, os resultados e as aprendizagens.'}),
+        field({label:'Palavras-chave',path:'palavras',req:1,ph:'palavra 1; palavra 2; palavra 3',help:'De 3 a 5, separadas por ponto e vírgula.'})),
+      h('div',{class:'card'},
+        field({label:'Abstract',path:'abstract',type:'textarea',rows:7,help:'Opcional. Versão do resumo em inglês.'}),
+        field({label:'Keywords',path:'keywords',ph:'word 1; word 2; word 3'})),
+      h('div',{class:'card'},
+        field({label:'Dedicatória',path:'dedicatoria',type:'textarea',rows:3,help:'Opcional. Texto curto; sai no pé da página, alinhado à direita.'}),
+        field({label:'Agradecimentos',path:'agradecimentos',type:'textarea',rows:5,help:'Opcional.'}),
+        h('div',{class:'grid2'},
+          field({label:'Epígrafe',path:'epigrafe',type:'textarea',rows:3,help:'Opcional. Citação relacionada ao tema, sem aspas.'}),
+          field({label:'Autor da epígrafe',path:'epigrafeAutor',ph:'Ex.: Paulo Freire'}))),
+      h('div',{class:'card'}, h('div',{class:'lbl',text:'Lista de abreviaturas e siglas'}), h('p',{class:'help',text:'Opcional. Sai em ordem alfabética. Apague as linhas que não usar.'}),
+        rowsEditor('siglas',[{key:'sigla',label:'Sigla',w:'22%'},{key:'sig',label:'Significado'}],()=>({sigla:'',sig:''}))),
+      h('div',{class:'card'}, field({label:'Referências',path:'referencias',type:'textarea',rows:10,req:1,help:'Uma referência por linha, conforme a ABNT NBR 6023. Liste apenas o que foi citado no texto; a ordem alfabética é feita automaticamente.'})),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Apêndices e anexos'}),
+        h('p',{class:'help',text:'Opcionais. Apêndice é material elaborado por você (questionário, cronograma, roteiro de entrevista, código). Anexo é documento de outra autoria (termo, declaração, manual, norma). Cada um sai em página própria, com letra sequencial, para você colar o conteúdo no Word.'}),
+        h('div',{class:'lbl',text:'Apêndices'}),
+        rowsEditor('apendices',[{key:'titulo',label:'Título',w:'45%',ph:'Ex.: Questionário aplicado aos produtores'},{key:'descricao',label:'Observação (opcional)',ph:'O que deve ser colado nesta página'}],()=>({titulo:'',descricao:''}),{empty:true,add:'+ Adicionar apêndice'}),
+        h('div',{class:'lbl',text:'Anexos'}),
+        checkbox('chkAnexos',['Incluir anexos padrão','Anexo com o Plano de Atividades e anexo com os documentos comprobatórios da modalidade.'],'anexos'),
+        rowsEditor('anexosExtra',[{key:'titulo',label:'Título',w:'45%',ph:'Ex.: Declaração da unidade concedente'},{key:'descricao',label:'Observação (opcional)'}],()=>({titulo:'',descricao:''}),{empty:true,add:'+ Adicionar anexo'})))];
+}
 
-  const uv=c.uv_index??h.uv_index[i0]??0, uvMax=dl.uv_index_max[0];
-  const uvTxt=v=>v<3?"Baixo":v<6?"Moderado":v<8?"Alto":v<11?"Muito alto":"Extremo";
-  const rh=c.relative_humidity_2m, pmax=dl.precipitation_probability_max[0]??0;
-  const stats=[
-    {k:"Umidade",v:`${r0(rh)}<small>%</small>`,s:rh<30?"ar muito seco":rh<45?"ar seco":"confortável"},
-    {k:"Vento",v:`${r0(c.wind_speed_10m)}<small>km/h ${compass(c.wind_direction_10m)}</small>`,s:`rajadas de ${r0(c.wind_gusts_10m)} km/h`},
-    {k:"Índice UV",v:`${r0(uv)}<small>${uvTxt(uv)}</small>`,s:`máx. hoje ${r0(uvMax)}`,uv:true},
-    {k:"Chuva hoje",v:`${pmax}<small>%</small>`,s:`${(dl.precipitation_sum[0]||0).toFixed(1)} mm previstos`},
-    {k:"Nebulosidade",v:`${r0(c.cloud_cover)}<small>%</small>`,s:c.cloud_cover<25?"céu aberto":c.cloud_cover<70?"nuvens esparsas":"encoberto"},
-    {k:"Pressão",v:`${r0(c.pressure_msl)}<small>hPa</small>`,s:"nível do mar"},
+function stepModelo(){
+  const n=secN(), S1=sci(), ks=sel();
+  const num=(label,key,help)=>field({label,path:'modelo.'+key,type:'number',min:0,max:20,help});
+  return [...head('Etapa 3 · Modelo para o estudante','Estrutura do modelo','Cada seção do modelo sai com um quadro de ORIENTAÇÃO próprio da modalidade escolhida e com marcações em amarelo onde o estudante deve escrever. Ele apaga os quadros antes de entregar.'),
+    !ks.length? h('div',{class:'note',style:'margin-bottom:16px'}, 'Escolha a modalidade do estudante para que as orientações e as seções correspondam a ela. ', h('button',{type:'button',onclick:()=>go(1)},'Ir para Modalidades')) : null,
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Seções'}),
+        h('p',{class:'help',text:S1? 'Projeto de ensino, pesquisa ou extensão como única modalidade: o modelo sai no formato científico (introdução com 1.1 a 1.4, referencial teórico, metodologia, resultados e discussão).' : 'Formato padrão: introdução, caracterização do contexto (subseções da modalidade), atividades desenvolvidas e resultados, considerações finais.'}),
+        h('div',{class:'grid2'},
+          num(S1? `Itens em ${n.ativ}.2 Resultados obtidos` : `Atividades em ${n.ativ}.2 Descrição das atividades`,'nDesc',`Cada item sai como subseção (${n.ativ}.2.1, ${n.ativ}.2.2…) com título a preencher.`),
+          S1? num(`Subseções do referencial teórico (${n.ref}.x)`,'nRef','Use 0 para texto corrido, sem subseções.') : null,
+          S1? num(`Subseções da metodologia (${n.met}.x)`,'nMet','Use 0 para texto corrido, sem subseções.') : null),
+        checkbox('chkEx',['Incluir exemplos de figura e tabela',`Uma figura com moldura em ${n.ativ}.2.1 e uma tabela em ${n.ativ}.3, com título e fonte no padrão ABNT, e as listas de figuras e de tabelas.`],'modelo.exemplos')),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Elementos pré-textuais opcionais'}),
+        h('p',{class:'help',text:'Os marcados entram no modelo com espaço para o estudante preencher ou apagar.'}),
+        h('div',{class:'mods'}, [['agradecimentos','Agradecimentos'],['dedicatoria','Dedicatória'],['epigrafe','Epígrafe'],['abstract','Abstract e keywords'],['siglas','Lista de abreviaturas e siglas']].map(([k,l])=>checkbox('chkM'+k,[l],'modelo.'+k)))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Apêndices e anexos'}),
+        checkbox('chkAnexosM',['Incluir anexos padrão','Anexo A com o Plano de Atividades e Anexo B com os documentos comprobatórios usuais da modalidade.'],'anexos'),
+        h('div',{class:'lbl',text:'Apêndices'}),
+        rowsEditor('apendices',[{key:'titulo',label:'Título',w:'45%',ph:'Ex.: Questionário aplicado'},{key:'descricao',label:'Observação (opcional)',ph:'O que o estudante deve colar nesta página'}],()=>({titulo:'',descricao:''}),{empty:true,add:'+ Adicionar apêndice'}),
+        h('div',{class:'lbl',text:'Outros anexos'}),
+        rowsEditor('anexosExtra',[{key:'titulo',label:'Título',w:'45%',ph:'Ex.: Declaração da unidade concedente'},{key:'descricao',label:'Observação (opcional)'}],()=>({titulo:'',descricao:''}),{empty:true,add:'+ Adicionar anexo'})),
+      h('div',{class:'card'}, field({label:'Recado para o estudante',path:'modelo.recado',type:'textarea',rows:5,help:'Opcional. Sai na primeira página do modelo, junto com as instruções de preenchimento. Ex.: prazos de entrega das versões, forma de envio, combinados das orientações.'})))];
+}
+function checksModelo(){
+  const c=[]; const add=(ok,msg,lvl)=>c.push({ok,msg,lvl:ok?'ok':(lvl||'warn')});
+  const miss=identReq.filter(k=>!filled(S.ident[k]));
+  add(!miss.length, miss.length? `Identificação: ${miss.length} campo(s) em branco sairão destacados em amarelo para o estudante completar.` : 'Identificação completa.');
+  const ks=sel(); add(ks.length>0, ks.length? `Modalidade(s): ${ks.map(k=>nomeMod(k)).join(', ')}.` : 'Nenhuma modalidade escolhida: as orientações e a caracterização dependem dela.','miss');
+  if(sci()) add(true,'Formato científico (projeto de ensino, pesquisa ou extensão).');
+  ks.forEach(k=>{ const f=MODS[k].campos.filter(c=>c.req&&!filled(S.mods[k][c.k])); add(!f.length, f.length? `Dados de ${MODS[k].nome}: ${f.map(c=>c.l.toLowerCase()).join(', ')} em branco (o estudante completa).` : `Dados de ${MODS[k].nome} completos.`); });
+  add(filled(S.ident.titulo), filled(S.ident.titulo)? 'Título definido.' : 'Título em branco: o modelo sai com [TÍTULO DO RELATÓRIO] para o estudante definir.');
+  add(true, `${descList().length} item(ns) em ${secN().ativ}.2${sci()?`, ${subList('ref').length} subseção(ões) no referencial e ${subList('met').length} na metodologia`:''}.`);
+  return c;
+}
+function checks(){
+  if(MOD()) return checksModelo();
+  const c=[]; const add=(ok,msg,lvl)=>c.push({ok,msg,lvl:ok?'ok':(lvl||'miss')});
+  const miss=identReq.filter(k=>!filled(S.ident[k]));
+  add(!miss.length, miss.length? `Identificação: faltam ${miss.length} campo(s) obrigatório(s).` : 'Identificação completa.');
+  if(S.ident.banca){ const ex=S.examinadores.filter(r=>filled(r.nome)).length; add(ex>0, ex? `Banca: ${ex} examinador(es) informado(s).` : 'Banca marcada, mas nenhum examinador informado.','warn'); }
+  const ks=sel(); add(ks.length>0, ks.length? `Modalidade(s): ${ks.map(k=>nomeMod(k)).join(', ')}.` : 'Nenhuma modalidade escolhida.');
+  if(sci()) add(true,'Formato científico (projeto de ensino, pesquisa ou extensão).');
+  if(multiOri()){ const n=orientadores().length; add(n>1, n>1? `${n} orientadores(as) assinarão o Termo de Validação.` : 'Orientadores diferentes marcados, mas só um nome informado.','warn'); }
+  ks.forEach(k=>{ const f=MODS[k].campos.filter(c=>c.req&&!filled(S.mods[k][c.k])); add(!f.length, f.length? `Dados de ${MODS[k].nome}: falta ${f.map(c=>c.l.toLowerCase()).join(', ')}.` : `Dados de ${MODS[k].nome} completos.`); });
+  add(filled(S.ident.titulo), filled(S.ident.titulo)? 'Título definido.' : 'Título do relatório vazio (etapa Modalidades e título).');
+  if(ks.length>1){ const soma=ks.reduce((a,k)=>a+(+S.mods[k].ch||0),0); if(+S.ident.ch && soma && soma!==+S.ident.ch) add(false,`Formulário de identificação: a soma por modalidade (${soma} h) difere do total (${S.ident.ch} h).`,'warn'); }
+  add(filled(S.introducao),'Introdução'+(filled(S.introducao)?' escrita.':' vazia.'));
+  if(sci()) add(filled(S.objetivos),'Objetivos'+(filled(S.objetivos)?' escritos.':' vazios.'));
+  if(sci()){ const vz=[S.carac.E[1], S.refIntro||S.ref.map(x=>x.texto).join(''), S.metIntro||S.met.map(x=>x.texto).join('')].filter(v=>!filled(v)).length; add(!vz, vz? `Justificativa, referencial ou metodologia: ${vz} parte(s) vazia(s).`:'Justificativa, referencial e metodologia escritos.'); }
+  else if(ks.length){ const vz=ks.flatMap(k=>S.carac[k]).filter(v=>!filled(v)).length; add(!vz, vz? `Caracterização: ${vz} subseção(ões) vazia(s).`:'Caracterização completa.'); }
+  add(S.plano.some(r=>filled(r.atividade)),'Quadro de plano de atividades × execução'+(S.plano.some(r=>filled(r.atividade))?' preenchido.':' vazio.'));
+  const dv=S.descricao.filter(d=>!filled(d.texto)||!filled(d.titulo)).length; add(!dv, dv? `${sci()?'Resultados obtidos':'Descrição das atividades'}: ${dv} item(ns) sem título ou texto.`:`${sci()?'Resultados obtidos':'Descrição das atividades'} completa.`);
+  add(filled(S.resultados),(sci()?'Discussão dos resultados':'Resultados e produtos')+(filled(S.resultados)?' escritos.':' vazios.'));
+  add(filled(S.desafios),'Desafios e aprendizagens'+(filled(S.desafios)?' escritos.':' vazios.'));
+  add(S.teoria.some(r=>filled(r.disciplina)),'Quadro-síntese de teoria e prática'+(S.teoria.some(r=>filled(r.disciplina))?' preenchido.':' vazio.'));
+  add(filled(S.consideracoes),'Considerações finais'+(filled(S.consideracoes)?' escritas.':' vazias.'));
+  const w=words(S.resumo); add(w>=150&&w<=250, w? `Resumo com ${w} palavras (ideal: 150 a 250).`:'Resumo vazio.', w?'warn':'miss');
+  const pk=S.palavras.split(';').filter(x=>x.trim()).length; add(pk>=3&&pk<=5, `${pk} palavra(s)-chave (de 3 a 5).`, pk?'warn':'miss');
+  const nf=Object.values(S.figs||{}).flat().filter(f=>filled(f.titulo)).length; if(nf) add(true,`${nf} figura(s) com espaço reservado e legenda.`);
+  add(filled(S.referencias),'Referências'+(filled(S.referencias)?' listadas.':' vazias.'));
+  return c;
+}
+function stepRevisar(){
+  const c=checks(); const pend=c.filter(x=>!x.ok).length;
+  const ol=h('ol',{class:'outline'}, outline().map(([n,t,l])=>h('li',{class:'l'+l}, h('span',{class:'num',text:n}), h('span',{text:t}))));
+  const dicas=[
+    'Atualize o sumário e as listas: clique com o botão direito sobre cada um e escolha "Atualizar campo" > "Atualizar o índice inteiro". Se o Word perguntar sobre atualizar campos ao abrir, responda Sim.',
+    'Cole cada imagem no espaço reservado da figura correspondente. Para outras ilustrações, siga o mesmo padrão: título acima ("Figura N – …") e fonte abaixo.',
   ];
-  $("stats").innerHTML=stats.map(s=>`<div class="stat"><div class="k">${s.k}</div><div class="v num">${s.v}</div>${s.uv?`<div class="uvbar"><i style="left:${Math.min(uv/12,1)*100}%"></i></div>`:`<div class="s">${s.s}</div>`}</div>`).join("");
-
-  const m=Number(c.time.slice(5,7));
-  const season=(m>=2&&m<=5)?["Quadra chuvosa","rain"]:(m===1||m===6)?["Transição","sun"]:["Estação seca","sun"];
-  const chips=[`<span class="chip ${season[1]}">${season[0]}</span>`];
-  if(uvMax>=11) chips.push(`<span class="chip warn">UV extremo</span>`);
-  if(dl.temperature_2m_max[0]>=36) chips.push(`<span class="chip warn">Calor intenso</span>`);
-  if(pmax>=60) chips.push(`<span class="chip rain">Chuva provável</span>`);
-  $("chips").innerHTML=chips.join("");
-  $("season").textContent=season[0];
-
-  // Recomendações do dia
-  const todayIdx=h.time.map((t,i)=>[t,i]).filter(([t])=>t.startsWith(dl.time[0])).map(([,i])=>i);
-  const rhMin=Math.min(...todayIdx.map(i=>h.relative_humidity_2m[i]));
-  const al=[];
-  if(uvMax>=8) al.push(["hi",`UV ${uvTxt(uvMax).toLowerCase()} (${r0(uvMax)})`,"Evite sol direto das 10h às 15h. Use protetor, boné e roupas claras."]);
-  else if(uvMax>=6) al.push(["mid",`UV alto (${r0(uvMax)})`,"Proteção solar recomendada no fim da manhã e começo da tarde."]);
-  if(dl.temperature_2m_max[0]>=36) al.push(["hi",`Máxima de ${r0(dl.temperature_2m_max[0])}°C`,"Hidrate-se com frequência e prefira atividades físicas cedo."]);
-  else if(dl.temperature_2m_max[0]>=33) al.push(["mid",`Tarde quente: ${r0(dl.temperature_2m_max[0])}°C`,"Leve sua garrafinha de água para as aulas."]);
-  if(rhMin<30) al.push(["mid",`Umidade baixa (mín. ${r0(rhMin)}%)`,"Ar seco: beba água e umidifique os olhos se necessário."]);
-  if(pmax>=50) al.push(["blue",`Chuva: ${pmax}% de chance`,"Leve guarda-chuva e cuidado nas estradas de acesso à Chapada."]);
-  if(dl.wind_speed_10m_max[0]>=35) al.push(["mid","Vento forte",`Rajadas podem passar de ${r0(dl.wind_speed_10m_max[0])} km/h.`]);
-  if(!al.length) al.push(["ok","Condições tranquilas","Nenhum alerta para hoje. Bom dia de aula!"]);
-  $("alerts").innerHTML=al.slice(0,3).map(([c,b,s])=>`<div class="alert ${c}"><span class="dot"></span><div><b>${b}</b><span>${s}</span></div></div>`).join("");
-
-  // Janela para atividades ao ar livre (restante do dia, 6h–18h)
-  const ok=todayIdx.filter(i=>{const hr=+h.time[i].slice(11,13);return i>=i0&&hr>=6&&hr<=17&&h.uv_index[i]<6&&h.temperature_2m[i]<32&&(h.precipitation_probability[i]??0)<40});
-  const ranges=[];ok.forEach(i=>{const hr=+h.time[i].slice(11,13);const last=ranges.at(-1);if(last&&last[1]===hr)last[1]=hr+1;else ranges.push([hr,hr+1])});
-  $("window").textContent=ranges.length?ranges.map(([a,b])=>`${String(a).padStart(2,"0")}h–${String(b).padStart(2,"0")}h`).join(" · "):"Sem janela ideal hoje";
-  $("sunrise").textContent=hhmm(dl.sunrise[0]);
-  $("sunset").textContent=hhmm(dl.sunset[0]);
-
-  lastHourly=[h,i0]; renderChart(h,i0);
-  renderDays(dl); renderAgro(dl);
+  if(apAnLista().length) dicas.push('Cole o conteúdo de cada apêndice e anexo na página correspondente.');
+  dicas.push(S.ident.banca? 'Revise a ortografia e envie ao seu orientador(a). A folha de aprovação é assinada pela banca no dia da apresentação.' : 'Revise a ortografia e envie ao seu orientador(a). Ele(a) preenche e assina o Termo de Validação (art. 6º).');
+  if(MOD()) return [...head('Etapa 4 · Conferência','Revisar e gerar o modelo', 'Confira os dados e gere o modelo. O estudante recebe apenas o .docx: identificação preenchida, seções da modalidade, quadros de orientação e marcações em amarelo onde deve escrever.'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Conferência'}), h('ul',{class:'checks'}, c.map(x=>h('li',{class:x.lvl==='ok'?'':x.lvl,text:x.msg})))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Estrutura do modelo'}), ol),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Depois de gerar'}), h('ul',{class:'checks'}, [
+        'Envie o arquivo ao estudante (SUAP, e-mail ou ambiente virtual). A primeira página do modelo traz as instruções de preenchimento e o seu recado; ele a apaga antes de entregar.',
+        'Use "Salvar rascunho" se quiser reaproveitar estes dados para outro orientando da mesma modalidade: basta abrir o rascunho, trocar o nome e gerar de novo.',
+        'Na entrega, confira se os quadros de orientação e as marcações em amarelo foram apagados e se o sumário foi atualizado.'].map(t=>h('li',{class:'warn',text:t})))),
+      h('div',{class:'rowbtns'}, h('button',{type:'button',class:'primary',onclick:gerar},'Gerar modelo (.docx)'), h('button',{type:'button',onclick:salvarJSON},'Salvar rascunho'), clearButton()))];
+  return [...head('Etapa 8 · Conferência','Revisar e gerar', pend? `Há ${pend} ponto(s) para conferir. Você pode gerar o arquivo mesmo assim: os trechos vazios saem destacados em amarelo no Word.` : 'Tudo preenchido. Gere o arquivo e revise no Word antes de enviar ao seu orientador(a).'),
+    h('div',{class:'stack'},
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Conferência'}), h('ul',{class:'checks'}, c.map(x=>h('li',{class:x.lvl==='ok'?'':x.lvl,text:x.msg})))),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Estrutura que será gerada'}), ol),
+      h('div',{class:'card'}, h('h3',{class:'sub',text:'Depois de gerar, no Word'}), h('ul',{class:'checks'}, dicas.map(t=>h('li',{class:'warn',text:t})))),
+      h('div',{class:'rowbtns'}, h('button',{type:'button',class:'primary',onclick:gerar},'Gerar relatório (.docx)'), h('button',{type:'button',onclick:salvarJSON},'Salvar rascunho'),
+        clearButton()))];
 }
 
-function renderChart(h,i0){
-  const el=$("chart"); const mobile=!document.body.classList.contains("fit");
-  const W=Math.max(mobile?860:300,el.clientWidth), H=Math.max(200,el.clientHeight||240);
-  const idx=[...Array(25)].map((_,k)=>i0+k).filter(i=>i<h.time.length);
-  const pl=30,pr=30, iconY=6, iconS=36, top=iconY+iconS+38, base=H-30, barH=Math.min(60,H*.22), bot=base-barH-10;
-  const T=idx.map(i=>h.temperature_2m[i]);
-  const tmin=Math.min(...T)-1, tmax=Math.max(...T)+1;
-  const x=k=>pl+k*(W-pl-pr)/(idx.length-1);
-  const y=t=>bot-(t-tmin)/(tmax-tmin)*(bot-top);
-  const pts=T.map((t,k)=>[x(k),y(t)]);
-  let path=`M${pts[0][0]},${pts[0][1]}`;
-  for(let k=1;k<pts.length;k++){const [x0,y0]=pts[k-1],[x1,y1]=pts[k],cx=(x0+x1)/2;path+=` C${cx},${y0} ${cx},${y1} ${x1},${y1}`}
-  const area=`${path} L${pts.at(-1)[0]},${bot} L${pts[0][0]},${bot} Z`;
-  const bw=(W-pl-pr)/(idx.length-1)*.55;
-  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Temperatura e chance de chuva nas próximas 24 horas" style="${mobile?`width:${W}px;position:static`:""}">
-  <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6a54a" stop-opacity=".35"/><stop offset="1" stop-color="#f6a54a" stop-opacity="0"/></linearGradient></defs>`;
-  idx.forEach((i,k)=>{const p=h.precipitation_probability[i]??0;if(p>0){const bh=p/100*barH;s+=`<rect x="${x(k)-bw/2}" y="${base-bh}" width="${bw}" height="${bh}" rx="3" fill="#8fbbe0" opacity=".85"/>`}});
-  s+=`<line x1="${pl}" x2="${W-pr}" y1="${base}" y2="${base}" stroke="#e6e0d2"/>`;
-  s+=`<path d="${area}" fill="url(#ga)"/><path d="${path}" fill="none" stroke="#e8711c" stroke-width="3.5" stroke-linecap="round"/>`;
-  idx.forEach((i,k)=>{
-    const p=h.precipitation_probability[i]??0;
-    if(p>=10) s+=`<text x="${x(k)}" y="${base-p/100*barH-5}" text-anchor="middle" font-family="Figtree,sans-serif" font-weight="700" font-size="13" fill="#2b78b8">${p}%</text>`;
-    if(k%3!==0) return;
-    s+=`<svg x="${x(k)-iconS/2}" y="${iconY}" width="${iconS}" height="${iconS}" viewBox="0 0 64 64">${iconInner(h.weather_code[i],h.is_day[i])}</svg>`;
-    s+=`<circle cx="${x(k)}" cy="${y(T[k])}" r="5" fill="#fff" stroke="#e8711c" stroke-width="3"/>`;
-    s+=`<text x="${x(k)}" y="${y(T[k])-14}" text-anchor="middle" font-family="Sora,Figtree,sans-serif" font-weight="600" font-size="21" fill="#17231d">${r0(T[k])}°</text>`;
-    s+=`<text x="${x(k)}" y="${H-6}" text-anchor="middle" font-family="Figtree,sans-serif" font-weight="${k===0?700:500}" font-size="16" fill="${k===0?"#17231d":"#5f6b63"}">${k===0?"Agora":h.time[i].slice(11,13)+"h"}</text>`;
-  });
-  el.innerHTML=s+`</svg>`;
-}
-
-function renderDays(dl){
-  const gmin=Math.min(...dl.temperature_2m_min), gmax=Math.max(...dl.temperature_2m_max), span=(gmax-gmin)||1;
-  $("days").innerHTML=dl.time.map((t,i)=>{
-    const dt=dateOf(t), name=i===0?"Hoje":i===1?"Amanhã":WEEKL[dt.getDay()];
-    const a=(dl.temperature_2m_min[i]-gmin)/span*100, b=(dl.temperature_2m_max[i]-gmin)/span*100;
-    const p=dl.precipitation_probability_max[i]??0;
-    return `<div class="drow ${i===0?"today":""}">
-      <div class="n">${name}<small>${dt.getDate()}/${dt.getMonth()+1}</small></div>
-      ${icon(dl.weather_code[i],1)}
-      <div class="rp">${p>=10?`💧 ${p}%`:""}</div>
-      <div class="mn num">${r0(dl.temperature_2m_min[i])}°</div>
-      <div class="range"><i style="left:${a}%;right:${100-b}%"></i></div>
-      <div class="mx num">${r0(dl.temperature_2m_max[i])}°</div>
-    </div>`;
-  }).join("");
-}
-
-function renderAgro(dl){
-  const et=dl.et0_fao_evapotranspiration, pr=dl.precipitation_sum.map(v=>v||0);
-  const sEt=et.reduce((a,b)=>a+b,0), sPr=pr.reduce((a,b)=>a+b,0), bal=sPr-sEt;
-  $("et0").innerHTML=`${et[0].toFixed(1)}<small>mm</small>`;
-  $("rain7").innerHTML=`${sPr.toFixed(1)}<small>mm</small>`;
-  $("bal7").innerHTML=`${bal>0?"+":""}${bal.toFixed(0)}<small>mm</small>`;
-  $("bal7").style.color=bal<0?"#b5541a":"#1d6b2b";
-  const mx=Math.max(...et,...pr,1);
-  $("balbars").innerHTML=dl.time.map((t,i)=>`<div class="col">
-      <div class="bars"><span style="height:${et[i]/mx*100}%;background:#f0c27a"></span><span style="height:${pr[i]/mx*100}%;background:#6fa8d8"></span></div>
-      ${i===0?"hoje":WEEK[dateOf(t).getDay()]}</div>`).join("");
-  $("agroNote").textContent = bal < -15
-    ? `Semana de déficit hídrico: a evaporação deve superar a chuva em ${Math.abs(bal).toFixed(0)} mm. Planeje a irrigação das áreas de cultivo.`
-    : bal < 0 ? "Leve déficit hídrico na semana: acompanhe a umidade do solo."
-    : "Chuva prevista suficiente para repor a evaporação da semana.";
-}
-
-function renderRegion(arr){
-  const list=Array.isArray(arr)?arr:[arr];
-  $("region").innerHTML=list.map((d,i)=>{
-    const c=CIDADES[i]; if(!c||!d.current) return "";
-    const p=d.daily.precipitation_probability_max[0]??0;
-    return `<div class="city ${c.here?"here":""}">${icon(d.current.weather_code,d.current.is_day)}
-      <div class="cn">${c.n}<span class="cr">${r0(d.daily.temperature_2m_max[0])}° / ${r0(d.daily.temperature_2m_min[0])}°${p>=20?` · 💧 ${p}%`:""}</span></div>
-      <div class="ct num">${r0(d.current.temperature_2m)}°</div></div>`;
-  }).join("");
-}
-
-/* ===== Dados de exemplo (só quando o serviço não responde) ===== */
-function demo(){
-  const now=new Date(new Date().toLocaleString("en-US",{timeZone:TZ}));
-  const pad=n=>String(n).padStart(2,"0");
-  const iso=(d,h,mi=0)=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(h)}:${pad(mi)}`;
-  const start=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const H={time:[],temperature_2m:[],precipitation_probability:[],precipitation:[],weather_code:[],uv_index:[],is_day:[],relative_humidity_2m:[]};
-  const D={time:[],weather_code:[],temperature_2m_max:[],temperature_2m_min:[],precipitation_sum:[],precipitation_probability_max:[],uv_index_max:[],sunrise:[],sunset:[],wind_speed_10m_max:[],et0_fao_evapotranspiration:[]};
-  for(let k=0;k<8;k++){
-    const d=new Date(start);d.setDate(d.getDate()+k);
-    const mx=34+Math.sin(k*1.3)*1.6, mn=23+Math.cos(k)*0.8, rp=[5,10,0,25,40,15,5,5][k];
-    for(let hr=0;hr<24;hr++){
-      const f=Math.max(0,Math.sin((hr-6)/12*Math.PI)), t=mn+(mx-mn)*Math.pow(Math.max(0,Math.sin((hr-5)/13*Math.PI)),1.1);
-      H.time.push(iso(d,hr));H.temperature_2m.push(+t.toFixed(1));H.is_day.push(hr>=6&&hr<18?1:0);
-      H.uv_index.push(+(12*Math.pow(f,1.6)).toFixed(1));H.relative_humidity_2m.push(Math.round(78-(t-mn)/(mx-mn)*44));
-      const p=hr>=13&&hr<=18?rp:Math.round(rp/4);H.precipitation_probability.push(p);H.precipitation.push(0);
-      H.weather_code.push(p>=35?80:hr>=6&&hr<18?(hr%5===0?2:1):0);
-    }
-    if(k>6) continue;
-    D.time.push(iso(d,0).slice(0,10));D.weather_code.push(rp>=35?80:rp>=20?2:1);
-    D.temperature_2m_max.push(+mx.toFixed(1));D.temperature_2m_min.push(+mn.toFixed(1));
-    D.precipitation_sum.push(rp>=35?2.4:rp>=20?0.3:0);D.precipitation_probability_max.push(rp);D.uv_index_max.push(12);
-    D.sunrise.push(iso(d,5,18));D.sunset.push(iso(d,17,35));
-    D.wind_speed_10m_max.push(24);D.et0_fao_evapotranspiration.push(+(6.1+Math.sin(k)*.4).toFixed(2));
+/* ====================== ARQUIVOS ====================== */
+const dlCap = (window.claude && typeof window.claude.use==='function') ? window.claude.use('downloads').catch(()=>null) : Promise.resolve(null);
+async function saveFile(filename, blob){
+  const cap = await dlCap;
+  if(cap){
+    try{ await cap.save({filename, data:blob}); toast(`${filename} pronto.`); }
+    catch(e){ if(e&&e.code==='declined') toast('Download cancelado.'); else if(e&&e.code==='rate_limited') toast('Já há um download aguardando confirmação.'); else toast('Não foi possível salvar o arquivo nesta visualização.'); }
+    return;
   }
-  const i=now.getHours();
-  const cur={time:iso(start,i,now.getMinutes()),temperature_2m:H.temperature_2m[i],relative_humidity_2m:H.relative_humidity_2m[i],
-    apparent_temperature:H.temperature_2m[i]+1.5,is_day:H.is_day[i],precipitation:0,weather_code:H.weather_code[i],cloud_cover:22,pressure_msl:1011,
-    wind_speed_10m:17,wind_direction_10m:110,wind_gusts_10m:31,uv_index:H.uv_index[i]};
-  const region=CIDADES.map((c,j)=>({current:{temperature_2m:cur.temperature_2m+[0.4,-0.8,1.1,0.2,0.6,0.9,0.3,-0.5][j],weather_code:j%3?1:2,is_day:cur.is_day},
-    daily:{temperature_2m_max:[D.temperature_2m_max[0]+[0,-1,1.5,.5,.8,1,.4,-.6][j]],temperature_2m_min:[D.temperature_2m_min[0]],precipitation_probability_max:[[5,0,20,5,5,10,15,20][j]]}}));
-  return {campus:{current:cur,hourly:H,daily:D},region};
+  const url=URL.createObjectURL(blob); const a=h('a',{href:url,download:filename}); document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+  toast(`${filename} baixado.`);
 }
+const slug=s=>(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,40);
+function salvarJSON(){ saveFile(`Rascunho_PP_${slug(S.ident.estudante)||'relatorio'}.json`, new Blob([JSON.stringify(S,null,1)],{type:'application/json'})); }
+$('#btnSave').onclick=salvarJSON;
+$('#btnOpen').onclick=()=>$('#fileOpen').click();
+$('#fileOpen').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||!d.ident) throw 0; S=merge(blankState(),migrate(d)); scheduleSave(); go(0); toast('Rascunho aberto.'); }catch(_){ toast('Este arquivo não é um rascunho deste formulário.'); } e.target.value=''; };
+  r.readAsText(f);
+};
+$('#btnDocx').onclick=gerar;
 
-/* ===== Ciclo de atualização ===== */
-const hora = () => new Date().toLocaleTimeString("pt-BR",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});
-function setStatus(live,txt,sub){ $("status").classList.toggle("demo",!live); $("statusTxt").textContent=txt; if(sub) $("connSub").textContent=sub; }
-async function load(){
+/* ====================== GERAÇÃO DO DOCX ====================== */
+function gerar(){
+  if(!window.docx){ toast('A biblioteca de geração não carregou. Verifique a conexão e recarregue a página.'); return; }
   try{
-    const [campus,region]=await Promise.all([getJSON(urlCampus()),getJSON(urlRegiao())]);
-    renderCampus(campus); renderRegion(region);
-    const hh=hora(); lastOk=hh; setStatus(true,"Ao vivo","Última atualização às "+hh+" · próxima em "+REFRESH_MIN+" min"); $("upd").textContent="última atualização às "+hh;
-  }catch(e){
-    console.warn("Falha ao consultar o serviço de meteorologia:",e);
-    if(lastOk){ setStatus(false,"Sem conexão","Exibindo dados das "+lastOk+" · tentando novamente"); setTimeout(load,60000); return; }
-    const d=demo(); renderCampus(d.campus); renderRegion(d.region);
-    setStatus(false,"Sem conexão · dados de exemplo","Nova tentativa a cada minuto"); $("upd").textContent="dados de exemplo";
-    setTimeout(load,60000);
-  }
+    const doc=buildDoc();
+    window.docx.Packer.toBlob(doc).then(b=>saveFile(MOD()? `Modelo_Relatorio_PP_${slug(S.ident.estudante)||'estudante'}.docx` : `Relatorio_Pratica_Profissional_${slug(S.ident.estudante)||'estudante'}.docx`, b));
+  }catch(err){ console.error(err); toast('Erro ao gerar o arquivo: '+err.message); }
 }
-load();
-setInterval(load,REFRESH_MIN*60*1000);
+function fmtDate(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+
+function buildDoc(){
+  const D=window.docx;
+  const {Document,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,ShadingType,AlignmentType,HeadingLevel,PageBreak,Header,Footer,PageNumber,TableOfContents,BorderStyle,VerticalAlign,SimpleField,HeightRule}=D;
+  const FONT='Arial', W=9071, L15=360;
+  const I=S.ident, ks=sel(); const ORI=orientadores(); const COO=coorients(); const SCI=sci(); const N=secN(); const A=ativLabels(); const MM=MOD();
+  const ph=(txt)=>new TextRun({text:`[${txt}]`,font:FONT,highlight:'yellow'});
+  const v=(val,label)=> filled(val)? new TextRun({text:val.trim(),font:FONT}) : ph(label);
+  const t=(text,o={})=>new TextRun({text,font:FONT,...o});
+  const P=(children,o={})=>new Paragraph({children,spacing:{line:L15,after:0},alignment:AlignmentType.JUSTIFIED,indent:{firstLine:709},...o});
+  const center=(children,o={})=>new Paragraph({children,alignment:AlignmentType.CENTER,spacing:{line:L15,after:0},...o});
+  const blank=(n=1)=>Array.from({length:n},()=>new Paragraph({children:[t('')],spacing:{line:L15,after:0}}));
+  const br=()=>new Paragraph({children:[new PageBreak()]});
+  const H1=x=>new Paragraph({heading:HeadingLevel.HEADING_1,children:[t(x)],spacing:{after:360,line:L15},keepNext:true});
+  const H2=x=>new Paragraph({heading:HeadingLevel.HEADING_2,children:[t(x)],spacing:{before:360,after:360,line:L15},keepNext:true});
+  const H3=x=>new Paragraph({heading:HeadingLevel.HEADING_3,children:[t(x)],spacing:{before:360,after:360,line:L15},keepNext:true});
+  const HC=(x,toc=true)=>new Paragraph({heading:toc?HeadingLevel.HEADING_1:undefined,children:[t(x,{bold:true})],alignment:AlignmentType.CENTER,spacing:{after:360,line:L15}});
+  const paras=(txt,label)=>{ const ps=(txt||'').split(/\n+/).map(s=>s.trim()).filter(Boolean); return ps.length? ps.map(s=>P([t(s)])) : [P([ph(label)])]; };
+  // texto com subseções marcadas por "## Título" (formato científico)
+  const parasSub=(txt,label,base)=>{ const out=[]; let k=0; const ls=(txt||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    if(!ls.length) return [P([ph(label)])];
+    ls.forEach(s=>{ if(/^##\s*/.test(s)) out.push(H2(`${base}.${++k} ${up(s.replace(/^##\s*/,''))}`)); else out.push(P([t(s)])); }); return out; };
+  const up=s=>(s||'').toLocaleUpperCase('pt-BR');
+  const b={style:BorderStyle.SINGLE,size:4,color:'000000'}; const borders={top:b,bottom:b,left:b,right:b};
+  // quadro de orientação (só no modelo para o estudante)
+  const gb={style:BorderStyle.SINGLE,size:6,color:'2E75B6'};
+  const GB=(lines,tit)=>{ if(!MM) return []; const L=[].concat(lines).filter(Boolean); if(!L.length) return [];
+    return [new Table({width:{size:W,type:WidthType.DXA},columnWidths:[W],rows:[new TableRow({cantSplit:true,children:[new TableCell({width:{size:W,type:WidthType.DXA},borders:{top:gb,bottom:gb,left:gb,right:gb},shading:{type:ShadingType.CLEAR,fill:'EAF1FB',color:'auto'},margins:{top:80,bottom:80,left:140,right:140},
+      children:[new Paragraph({children:[t(tit||'ORIENTAÇÃO (apague este quadro antes de entregar)',{bold:true,size:18,color:'1F4E8C'})],spacing:{after:60}}),
+        ...L.map(x=>new Paragraph({children:[t((L.length>1?'• ':'')+x,{size:18})],indent:L.length>1?{left:220,hanging:220}:undefined,spacing:{after:40,line:260}}))]})]})]}),
+      new Paragraph({children:[],spacing:{after:120}})]; };
+  const cell=(content,width,o={})=>new TableCell({width:{size:width,type:WidthType.DXA},borders,columnSpan:o.span,
+    shading:o.head?{type:ShadingType.CLEAR,fill:'E7E6E6',color:'auto'}:undefined,margins:{top:60,bottom:60,left:100,right:100},verticalAlign:VerticalAlign.CENTER,
+    children:[new Paragraph({children:[content instanceof TextRun? content : t(String(content??''),{bold:!!(o.head||o.bold),size:20})],alignment:o.head?AlignmentType.CENTER:AlignmentType.LEFT})]});
+  const small=(val,label)=> filled(val)? t(String(val).trim(),{size:20}) : new TextRun({text:`[${label}]`,font:FONT,size:20,highlight:'yellow'});
+  const quadro=(widths,header,rows)=>new Table({width:{size:widths.reduce((a,c)=>a+c,0),type:WidthType.DXA},columnWidths:widths,rows:[
+    ...(header?[new TableRow({tableHeader:true,cantSplit:true,children:header.map((x,i)=>cell(x,widths[i],{head:true}))})]:[]),
+    ...rows.map(r=>new TableRow({cantSplit:true,children:r.map((c,i)=>cell(c.content??c,(c.opts&&c.opts.span)?widths.reduce((x,y)=>x+y,0):widths[i],c.opts||{}))}))]});
+  // legendas com campo SEQ (alimentam a Lista de ilustrações do Word)
+  let qn=0, fn=0;
+  const caption=x=>{ qn++; return new Paragraph({children:[t('Quadro '), new SimpleField(' SEQ Quadro \\* ARABIC ', String(qn)), t(` – ${x}`)],spacing:{before:240,after:60},keepNext:true}); };
+  const fonte=(x='Fonte: autoria própria.')=>new Paragraph({children:[t(x,{size:20})],spacing:{before:60,after:240}});
+  const figList=list=>list.flatMap(f=>{ fn++;
+    return [new Paragraph({children:[t('Figura '), new SimpleField(' SEQ Figura \\* ARABIC ', String(fn)), t(` – ${f.titulo.trim()}`)],alignment:AlignmentType.CENTER,spacing:{before:240,after:60},keepNext:true}),
+      new Table({width:{size:6800,type:WidthType.DXA},columnWidths:[6800],alignment:AlignmentType.CENTER,rows:[new TableRow({cantSplit:true,height:{value:3600,rule:HeightRule.ATLEAST},children:[new TableCell({width:{size:6800,type:WidthType.DXA},verticalAlign:VerticalAlign.CENTER,
+        borders:{top:{style:BorderStyle.DASHED,size:6,color:'999999'},bottom:{style:BorderStyle.DASHED,size:6,color:'999999'},left:{style:BorderStyle.DASHED,size:6,color:'999999'},right:{style:BorderStyle.DASHED,size:6,color:'999999'}},
+        children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'[Cole aqui a imagem e apague esta moldura]',font:FONT,size:20,italics:true,color:'777777',highlight:'yellow'})]})]})]})]}),
+      new Paragraph({children:[t('Fonte: '+(filled(f.fonte)?f.fonte.trim():'Acervo próprio ('+(I.ano||'')+')')+'.',{size:20})],alignment:AlignmentType.CENTER,spacing:{before:60,after:240}})]; });
+  const figuras=key=>figList(figsOf(key));
+  let tn=0;
+  const tabList=list=>list.flatMap(x=>{
+    const isT=x.tipo!=='Quadro'; let num; if(isT) num=++tn; else num=++qn;
+    let linhas=(x.dados||'').split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(';').map(c=>c.trim()));
+    const vaz=!linhas.length; if(vaz) linhas=[['[Coluna 1]','[Coluna 2]','[Coluna 3]'],['','',''],['','',''],['','','']];
+    const nc=Math.max(...linhas.map(r=>r.length)); linhas=linhas.map(r=>r.concat(Array(nc-r.length).fill('')));
+    const cw=Math.floor(W/nc), widths=Array(nc).fill(cw); widths[nc-1]=W-cw*(nc-1);
+    const none={style:BorderStyle.NONE,size:0,color:'FFFFFF'}, line={style:BorderStyle.SINGLE,size:6,color:'000000'};
+    const rows=linhas.map((r,ri)=>new TableRow({cantSplit:true,tableHeader:ri===0,children:r.map((c,ci)=>new TableCell({width:{size:widths[ci],type:WidthType.DXA},margins:{top:50,bottom:50,left:90,right:90},verticalAlign:VerticalAlign.CENTER,
+      borders: isT? {top: ri<=1?line:none, bottom: (ri===0||ri===linhas.length-1)?line:none, left:none, right:none} : borders,
+      shading: (!isT&&ri===0)?{type:ShadingType.CLEAR,fill:'E7E6E6',color:'auto'}:undefined,
+      children:[new Paragraph({alignment:AlignmentType.CENTER,children:[ (vaz&&ri>0)? new TextRun({text:' ',font:FONT,size:20}) : t(c,{size:20,bold:ri===0}) ]})]}))}));
+    return [new Paragraph({children:[t(isT?'Tabela ':'Quadro '), new SimpleField(isT?' SEQ Tabela \\* ARABIC ':' SEQ Quadro \\* ARABIC ', String(num)), t(` – ${x.titulo.trim()}`)],spacing:{before:240,after:60},keepNext:true}),
+      new Table({width:{size:W,type:WidthType.DXA},columnWidths:widths,rows}),
+      new Paragraph({children:[t('Fonte: '+(filled(x.fonte)?x.fonte.trim():'Autoria própria ('+(I.ano||'')+')')+'.',{size:20})],spacing:{before:60,after:240}})]; });
+  const tabelas=key=>tabList(((S.tabs&&S.tabs[key])||[]).filter(x=>filled(x.titulo)));
+  const cursoNome=filled(I.curso)?I.curso.trim():'[Curso]';
+  const modsTxt = ks.length? ks.map(k=>nomeMod(k)).join(ks.length===2?' e ':', ').replace(/, ([^,]*)$/,' e $1') : '[modalidade]';
+  const modLabel = ks.length>1? 'nas modalidades' : 'na modalidade';
+  const periodo = (filled(I.inicio)?fmtDate(I.inicio):'[início]')+' a '+(filled(I.fim)?fmtDate(I.fim):'[término]');
+  const titulo = filled(I.titulo)? up(I.titulo.trim())+(filled(I.subtitulo)?': '+up(I.subtitulo.trim()):'') : null;
+  const tituloRun = titulo? t(titulo,{bold:true}) : new TextRun({text:'[TÍTULO DO RELATÓRIO]',font:FONT,bold:true,highlight:'yellow'});
+  const nomeEst = ()=>center([filled(I.estudante)?t(up(I.estudante.trim())):ph('NOME DO(A) ESTUDANTE')]);
+  const prof=n=>/^prof/i.test(n)? n : 'Prof.(ª) '+n;
+
+  // capa
+  const capa=[
+    center([t('INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DO RIO GRANDE DO NORTE – CAMPUS ',{bold:true}), filled(I.campus)? t(up(I.campus.trim()),{bold:true}) : ph('CAMPUS')]),
+    center([t(`CURSO TÉCNICO DE NÍVEL MÉDIO EM ${up(cursoNome)} NA FORMA INTEGRADA`,{bold:true})]),
+    ...blank(4), nomeEst(),
+    ...blank(6), center([tituloRun]),
+  ];
+  const localAno=()=>new Footer({children:[center([filled(I.cidade)?t(up(I.cidade.trim())):ph('CIDADE')]), center([v(I.ano,'ANO')])]});
+  const vazio=()=>new Footer({children:[new Paragraph({children:[]})]});
+  const natureza=(runs)=>new Paragraph({children:runs,indent:{left:4536},alignment:AlignmentType.JUSTIFIED,spacing:{line:240,after:120}});
+  const naturezaTxt=()=>natureza([t(`Relatório Final de Prática Profissional, ${modLabel} ${modsTxt}, apresentado à Coordenação do Curso Técnico de Nível Médio em ${cursoNome} na forma Integrada do Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte, Campus `), v(I.campus,'Campus'), t(`, como requisito parcial para a obtenção do diploma de Técnico(a) de Nível Médio em ${cursoNome}.`)]);
+  const assin=(nome,papel,inst)=>[...blank(2),center([t('_______________________________________________')]),center([nome]),center([t(papel,{size:20})]),...(inst?[center([t(inst,{size:20})])]:[])];
+  const pre=[
+    nomeEst(), ...blank(7), center([tituloRun]), ...blank(3),
+    naturezaTxt(),
+    ...(ORI.length>1? [natureza([t('Orientadores(as): '+ORI.map(o=>(o.nome||'[nome]')+' ('+o.mods.map(nomeMod).join('; ')+')').join('; ')+'.')])] : [natureza([t('Orientador(a): '), v(I.orientador,'nome do(a) orientador(a)'), t('.')])]),
+    ...(COO.length? [natureza([t((COO.length>1?'Coorientadores(as): ':'Coorientador(a): ')+COO.join('; ')+'.')])] : []),
+    ...(S.mods.A.on && filled(S.mods.A.supervisor)? [natureza([t('Supervisor(a) de estágio: '+S.mods.A.supervisor.trim()+'.')])] : []),
+    ...(S.mods.B.on && filled(S.mods.B.monitor)? [natureza([t('Empregado(a) monitor(a): '+S.mods.B.monitor.trim()+'.')])] : []),
+  ];
+  const rosto=pre.splice(0,pre.length);
+  const IFRN='Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte';
+  if(I.banca){ // folha de aprovação
+    pre.push(nomeEst(), ...blank(2), center([tituloRun]), ...blank(2), naturezaTxt(), ...blank(1),
+      P([t(filled(I.dataDefesa)? `Apresentado em ${fmtDate(I.dataDefesa)}.` : 'Aprovado em: ____/____/________.')],{indent:{firstLine:0}}),
+      ...(filled(I.dataDefesa)? [P([t('Resultado: (   ) Aprovado(a)     (   ) Reprovado(a)')],{indent:{firstLine:0}})] : []),
+      ...blank(1), center([t('BANCA EXAMINADORA',{bold:true})]),
+      ...ORI.flatMap(o=>assin(filled(o.nome)?t(prof(o.nome)):ph('Orientador(a)'),'Orientador(a)'+(ORI.length>1?' – '+o.mods.map(nomeMod).join('; '):''),IFRN)),
+      ...COO.flatMap(c=>assin(t(prof(c)),'Coorientador(a)',IFRN)),
+      ...(S.examinadores.some(r=>filled(r.nome))? S.examinadores.filter(r=>filled(r.nome)) : [{nome:'',instituicao:IFRN}]).flatMap(r=>assin(filled(r.nome)?t(r.nome.trim()):ph('Examinador(a)'),'Examinador(a)',filled(r.instituicao)?r.instituicao.trim():IFRN)),
+      br());
+  } else { // termo de validação
+    pre.push(HC(ORI.length>1?'TERMO DE VALIDAÇÃO DO RELATÓRIO PELOS(AS) ORIENTADORES(AS)':'TERMO DE VALIDAÇÃO DO RELATÓRIO PELO(A) ORIENTADOR(A)',false),
+      ...GB(['Esta folha é preenchida e assinada pelo(a) orientador(a) depois de avaliar o relatório (art. 6º da Resolução nº 25/2019-CONSUP). Não a preencha; apenas confira o seu nome e a matrícula.']),
+      nomeEst(), center([tituloRun]), ...blank(1),
+      P([t(`${ORI.length>1?'Declaramos que analisamos':'Declaro que analisei'} o presente Relatório Final de Prática Profissional, desenvolvido ${modLabel} ${modsTxt}, no período de ${periodo}, com carga horária total de `), v(I.ch,'___'), t(` horas, e que o ${ORI.length>1?'consideramos':'considero'} em conformidade com o Plano de Atividades deferido, com a Regulamentação da Prática Profissional Discente do IFRN (Resolução nº 25/2019-CONSUP) e com o Projeto Pedagógico do Curso.`)]),
+      ...blank(1), P([t('Situação: (   ) Aprovado(a)     (   ) Reprovado(a)     (   ) Devolvido para ajustes')],{indent:{firstLine:0}}),
+      P([t('Data da validação: ____/____/________')],{indent:{firstLine:0}}),
+      ...ORI.flatMap(o=>assin(filled(o.nome)?t(prof(o.nome)):ph('Orientador(a)'), 'Orientador(a) – IFRN'+(filled(I.campus)?', Campus '+I.campus.trim():'')+(ORI.length>1?' – '+o.mods.map(nomeMod).join('; '):''))),
+      ...COO.flatMap(c=>assin(t(prof(c)),'Coorientador(a)')),
+      ...assin(filled(I.estudante)?t(I.estudante.trim()):ph('Estudante'), 'Estudante – Matrícula '+(I.matricula||'[nº]')),
+      ...blank(1), P([t('Ciência da Coordenação do Curso em ____/____/________.')],{indent:{firstLine:0}}),
+      ...assin(t('Nome: ______________________________________'), `Coordenador(a) do Curso Técnico de Nível Médio em ${cursoNome} na forma Integrada`), br());
+  }
+  const dir=runs=>new Paragraph({children:runs,alignment:AlignmentType.RIGHT,indent:{left:4536},spacing:{line:L15}});
+  if(mo('dedicatoria')) pre.push(...GB(['Elemento opcional. Texto curto em que o(a) autor(a) dedica o trabalho; fica no pé da página, alinhado à direita. Se não quiser, apague esta página.']), ...blank(MM?22:28), ...(filled(S.dedicatoria)? S.dedicatoria.split(/\n+/).filter(x=>x.trim()).map(x=>dir([t(x.trim(),{italics:true})])) : [dir([ph('Dedicatória')])]), br());
+  if(mo('agradecimentos')) pre.push(HC('AGRADECIMENTOS',false), ...GB(['Elemento opcional. Agradeça a quem contribuiu de forma relevante para a prática e o relatório. Se não quiser, apague esta página.']), ...paras(S.agradecimentos,'Agradecimentos'), br());
+  if(mo('epigrafe')) pre.push(...GB(['Elemento opcional. Citação relacionada ao tema, seguida da autoria; fica no pé da página. Se não quiser, apague esta página.']), ...blank(MM?22:28), dir([filled(S.epigrafe)? t(S.epigrafe.trim().replace(/\s*\n+\s*/g,' '),{italics:true}) : ph('Epígrafe')]),
+    ...(filled(S.epigrafeAutor)?[new Paragraph({children:[t('('+S.epigrafeAutor.trim()+')')],alignment:AlignmentType.RIGHT,spacing:{line:L15}})]:MM?[dir([ph('Autor(a)')])]:[]), br());
+  pre.push(HC('RESUMO',false), ...GB(['Parágrafo único, de 150 a 250 palavras, em voz ativa e na terceira pessoa do singular. Informe a modalidade, o local e o período, o objetivo, as principais atividades, os resultados e as aprendizagens. Escreva por último.','Palavras-chave: de 3 a 5, separadas por ponto e vírgula e terminadas por ponto.']), P([filled(S.resumo)? t(S.resumo.replace(/\s*\n+\s*/g,' ').trim()) : ph('Resumo')],{indent:{firstLine:0}}), ...blank(1),
+    P([t('Palavras-chave: ',{bold:true}), filled(S.palavras)? t(S.palavras.trim().replace(/\.?$/,'.')) : ph('palavra 1; palavra 2; palavra 3')],{indent:{firstLine:0}}), br());
+  if(mo('abstract')) pre.push(HC('ABSTRACT',false), ...GB(['Elemento opcional: versão do resumo em inglês. Se não quiser, apague esta página.']), P([filled(S.abstract)? t(S.abstract.replace(/\s*\n+\s*/g,' ').trim(),{italics:true}) : ph('Abstract')],{indent:{firstLine:0}}), ...blank(1),
+    P([t('Keywords: ',{bold:true}), filled(S.keywords)? t(S.keywords.trim().replace(/\.?$/,'.')) : ph('word 1; word 2; word 3')],{indent:{firstLine:0}}), br());
+  if(hasFigs()) pre.push(HC('LISTA DE FIGURAS',false), new TableOfContents('Lista de figuras',{hyperlink:true,captionLabelIncludingNumbers:'Figura'}), br());
+  pre.push(HC('LISTA DE QUADROS',false), new TableOfContents('Lista de quadros',{hyperlink:true,captionLabelIncludingNumbers:'Quadro'}), br());
+  if(hasTabs()) pre.push(HC('LISTA DE TABELAS',false), new TableOfContents('Lista de tabelas',{hyperlink:true,captionLabelIncludingNumbers:'Tabela'}), br());
+  let sig=S.siglas.filter(r=>filled(r.sigla)).sort((a,b)=>a.sigla.localeCompare(b.sigla,'pt-BR'));
+  if(MM && !S.modelo.siglas) sig=[]; if(MM && S.modelo.siglas && !sig.length) sig=[{sigla:'[SIGLA]',sig:'[Significado]'}];
+  if(sig.length) pre.push(HC('LISTA DE ABREVIATURAS E SIGLAS',false), ...GB(['Elemento opcional. Siglas e abreviaturas usadas no texto, em ordem alfabética. Acrescente as suas e apague as que não usar.']), quadro([1800,7271],null,sig.map(r=>[r.sigla.trim(), r.sig.trim()])), br());
+  pre.push(HC('SUMÁRIO',false), new TableOfContents('Sumário',{hyperlink:true,headingStyleRange:'1-3'}));
+
+  // ================= textuais
+  const T=[];
+  if(SCI){
+    T.push(H1(`${N.intro} INTRODUÇÃO`), H2(`${N.intro}.1 CONTEXTUALIZAÇÃO`), ...GB(['Apresente o tema e o problema ou a demanda que originou o projeto, com apoio da literatura (citações conforme a NBR 10520).','Apresente também o projeto: tipo, edital, coordenação, período e, se for o caso, a equipe e a sua parte nela. Muita gente escreve a introdução por último.']), ...paras(S.introducao,'Contextualização'));
+    T.push(H2(`${N.intro}.2 OBJETIVOS`), ...GB(['Escreva o objetivo geral e, em seguida, os objetivos específicos, conforme o Plano de Atividades e o projeto.']), ...paras(S.objetivos,'Objetivo geral e objetivos específicos'));
+    T.push(H2(`${N.intro}.3 JUSTIFICATIVA`), ...GB(['Explique a relevância do projeto para a comunidade, para a área técnica e para a sua formação.']), ...paras(S.carac.E[1],'Justificativa'));
+    T.push(H2(`${N.intro}.4 ESTRUTURA DO RELATÓRIO`), ...GB(['Texto sugerido a partir da estrutura deste modelo. Ajuste se acrescentar ou retirar seções.']), ...paras(MM&&!filled(S.estrutura)? estruturaSug() : S.estrutura,'Estrutura do relatório'));
+  } else { T.push(H1(`${N.intro} INTRODUÇÃO`), ...GB(['Apresente o contexto da prática (modalidade, local, período e carga horária).','Apresente o objetivo geral e os objetivos específicos, conforme o Plano de Atividades.','Mostre a importância da prática para a sua formação e para o perfil profissional de conclusão do curso (PPC).','No último parágrafo, diga o que cada seção do relatório traz. Muita gente escreve a introdução por último.']), ...paras(S.introducao,'Introdução')); if(filled(S.objetivos)) T.push(...paras(S.objetivos)); }
+  if(SCI){
+    const secSubs=(num,titulo,intro,subs,pref,label,guia)=>{ T.push(br(), H1(`${num} ${titulo}`), ...GB(guia));
+      if(filled(intro)||!subs.length) T.push(...paras(intro,label)); T.push(...figuras(pref));
+      subs.forEach((x,i)=>{ T.push(H2(`${num}.${i+1} ${up(filled(x.titulo)?x.titulo.trim():'[Título da subseção]')}`), ...paras(x.texto,'Texto da subseção'), ...figuras(pref+'_'+i)); }); };
+    secSubs(N.ref,'REFERENCIAL TEÓRICO',S.refIntro,subList('ref'),'ref','Referencial teórico',['Conceitos, autores e estudos que fundamentam o projeto, com citações conforme a NBR 10520.', subList('ref').length? 'Dê um título a cada subseção; acrescente ou apague subseções conforme a necessidade (estilo Título 2). Um parágrafo de abertura antes da primeira subseção é opcional.' : 'Se o tema tiver partes distintas, divida em subseções (estilo Título 2).']);
+    secSubs(N.met,'METODOLOGIA',S.metIntro,subList('met'),'met','Metodologia',['Descreva como o projeto foi conduzido: tipo de estudo ou de intervenção, local, etapas, materiais e equipamentos, instrumentos e procedimentos de coleta e análise dos dados.', 'Use subseções para as etapas ou procedimentos, se ajudar a organizar.']);
+  } else {
+    T.push(br(), H1(`${N.carac} CARACTERIZAÇÃO DO CONTEXTO DA PRÁTICA PROFISSIONAL`));
+    if(!ks.length) T.push(P([ph('Escolha a modalidade no formulário')]));
+    caracOutline().forEach(x=>{
+      const title=`${x.num} ${up(x.titulo)}`;
+      if(x.head){ T.push(H2(title)); return; }
+      T.push(x.nivel===2? H2(title) : H3(`${x.num} ${x.titulo}`));
+      T.push(...GB([MODS[x.key].secoes[x.idx][1]]), ...paras(S.carac[x.key][x.idx], x.titulo));
+      if(x.idx===MODS[x.key].secoes.length-1) T.push(...figuras(`carac_${x.key}`));
+    });
+  }
+  T.push(br(), H1(A.sec), H2(A.plano), ...GB(['Preencha o quadro com as atividades do Plano de Atividades deferido (art. 4º, IV) e o que aconteceu com cada uma: realizada, realizada parcialmente ou não realizada, com a carga horária.','Se alguma atividade não foi realizada ou mudou, explique em Observações. Acrescente as linhas necessárias.']));
+  T.push(P([t(`O Quadro ${qn+1} relaciona as atividades previstas no Plano de Atividades com a sua execução.`)]));
+  T.push(caption('Plano de atividades e execução'));
+  const pl=S.plano.filter(r=>filled(r.atividade)||filled(r.obs));
+  const vz=n=>Array.from({length:n},()=>({atividade:'',situacao:'',ch:'',obs:'',disciplina:'',aplicacao:''}));
+  T.push(quadro([3300,1700,1171,2900],['Atividade prevista no Plano','Situação','Carga horária','Observações'],
+    (pl.length?pl:vz(MM?3:1)).map(r=>[{content:small(r.atividade,'atividade')},r.situacao||'',r.ch?r.ch+' h':'',r.obs||''])), fonte());
+  T.push(H2(A.desc), ...GB([SCI? 'Crie um item para cada resultado ou etapa do projeto, com dados, medições ou produtos obtidos e a sua participação.' : 'Crie um item para cada atividade ou tema, em ordem cronológica ou temática: o que foi feito, como, com quais ferramentas, equipamentos, softwares ou normas técnicas, e qual foi a sua participação.', 'Em cada item, aponte os conhecimentos do curso que foram aplicados.', 'Dê um título a cada item; acrescente ou apague itens conforme a necessidade (estilo Título 3). Não exponha pessoas ou dados sigilosos sem autorização.']));
+  descList().forEach((d,i)=>{ T.push(H3(`${A.n}.2.${i+1} ${filled(d.titulo)?d.titulo.trim():(SCI?'[Resultado ou etapa]':'[Atividade ou tema]')}`)); T.push(...paras(d.texto, SCI?'Resultado obtido':'Descrição da atividade')); if(filled(d.conhecimentos)) T.push(...paras(d.conhecimentos)); T.push(...figuras('desc_'+i), ...tabelas('desc_'+i)); if(MM && i===0 && S.modelo.exemplos) T.push(...figList([{titulo:'[Título da figura]',fonte:''}])); });
+  const resGuia = SCI? 'Discuta os resultados: compare-os com os objetivos e com o referencial teórico, aponte limitações e possibilidades de continuidade.' : 'Apresente o que foi produzido ou alcançado. '+(ks.length? 'Para a sua modalidade: '+ks.map(k=>`${MODS[k].nome.toLowerCase()} — ${MODS[k].res}`).join('; ')+'.' : '');
+  T.push(H2(A.res), ...GB([resGuia, 'Dados numéricos vão em tabela (bordas laterais abertas); informações em texto vão em quadro (todas as bordas). Título acima, fonte abaixo. Para numerar, use Referências > Inserir Legenda.']), ...paras(S.resultados, SCI?'Discussão dos resultados':'Resultados e produtos'), ...figuras('resultados'), ...tabelas('resultados'));
+  if(MM && S.modelo.exemplos) T.push(...tabList([{tipo:'Tabela',titulo:'[Título da tabela]',dados:'',fonte:''}]));
+  T.push(H2(A.des), ...GB(['Dificuldades encontradas e como foram resolvidas.','Competências técnicas e de relacionamento desenvolvidas (comunicação, trabalho em equipe, autonomia).','Cuidados com ética, sigilo, saúde e segurança.']), ...paras(S.desafios,'Desafios e aprendizagens'));
+  T.push(H2(A.teo), ...GB(['A articulação entre teoria e prática é o fundamento da prática profissional no IFRN (art. 2º). Preencha o quadro com as disciplinas e os conhecimentos usados, incluindo os que você precisou aprender fora do currículo.','Depois do quadro, comente em que a formação ajudou, o que faltou e como você buscou esse conhecimento.']));
+  T.push(P([t(`O Quadro ${qn+1} sintetiza a relação entre as disciplinas do curso e as atividades desenvolvidas.`)]));
+  T.push(caption('Relação entre disciplinas do curso e atividades desenvolvidas'));
+  const te=S.teoria.filter(r=>filled(r.disciplina)||filled(r.aplicacao));
+  T.push(quadro([3000,6071],['Disciplina / conhecimento','Aplicação na prática profissional'],(te.length?te:vz(MM?3:1)).map(r=>[{content:small(r.disciplina,'disciplina')},{content:small(r.aplicacao,'aplicação')}])), fonte());
+  if(filled(S.teoriaTexto)) T.push(...paras(S.teoriaTexto));
+  T.push(br());
+  T.push(H1(`${N.consid} CONSIDERAÇÕES FINAIS`), ...GB(['Retome os objetivos da introdução e diga se foram alcançados.','Faça um balanço da contribuição da prática para a sua formação e para os seus planos profissionais.','Apresente sugestões para a unidade concedente, o projeto ou o curso e, se for o caso, propostas de continuidade.']), ...paras(S.consideracoes,'Considerações finais'), br());
+  T.push(HC('REFERÊNCIAS'), ...GB(['Liste apenas o que foi citado no texto, em ordem alfabética, conforme a NBR 6023, com espaçamento simples e uma linha em branco entre as referências.','Livro: SOBRENOME, Nome. Título: subtítulo. Edição. Cidade: Editora, ano.','Página na internet: AUTOR ou INSTITUIÇÃO. Título. Cidade, ano. Disponível em: endereço. Acesso em: dia mês abreviado ano.']));
+  const refs=S.referencias.split(/\n+/).map(s=>s.trim()).filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  if(refs.length) refs.forEach(r=>T.push(new Paragraph({children:[t(r)],alignment:AlignmentType.LEFT,spacing:{line:240,after:240}})));
+  else T.push(P([ph('Referências')],{indent:{firstLine:0}}));
+  apAnLista().forEach(x=>{
+    T.push(br(), HC(`${up(x.rotulo)} – ${up(filled(x.titulo)?x.titulo.trim():'[título]')}`));
+    if(x.padrao==='plano') T.push(P([t('[Insira aqui a cópia do Plano de Atividades deferido pelo(a) orientador(a) e pela Coordenação do Curso – art. 4º, IV.]',{italics:true,color:'666666'})],{indent:{firstLine:0},alignment:AlignmentType.CENTER}));
+    else if(x.padrao==='docs'){ T.push(P([t('[Insira aqui os documentos comprobatórios da prática profissional – art. 4º, V. Documentos usuais para a(s) sua(s) modalidade(s):]',{italics:true,color:'666666'})],{indent:{firstLine:0}}));
+      (ks.length?ks:KEYS).forEach(k=>T.push(P([t(`${MODS[k].nome}: `,{italics:true,bold:true,color:'666666'}), t(MODS[k].docs+'.',{italics:true,color:'666666'})],{indent:{firstLine:0}}))); }
+    else T.push(P([t(`[Insira aqui o conteúdo ${x.tipo==='ANEXO'?'do anexo':'do apêndice'}${filled(x.descricao)?': '+x.descricao.trim():''}.]`,{italics:true,color:'666666'})],{indent:{firstLine:0},alignment:AlignmentType.CENTER}));
+  });
+
+  // formulário de identificação (NBR 10719, pós-textual)
+  T.push(br(), HC('FORMULÁRIO DE IDENTIFICAÇÃO'));
+  const idRows=[['Título e subtítulo',t(filled(I.titulo)?I.titulo.trim()+(filled(I.subtitulo)?': '+I.subtitulo.trim():''):'',{size:20})],['Tipo de relatório',t('Relatório Final de Prática Profissional',{size:20})],['Autor(a)',small(I.estudante,'nome')],['Matrícula',small(I.matricula,'nº')],['Curso',t(`Técnico de Nível Médio em ${cursoNome} na forma Integrada`,{size:20})],
+    ['Instituição',t('Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Norte – Campus '+(I.campus||'[campus]'),{size:20})],...(multiOri()?[]:[['Orientador(a)',small(I.orientador,'orientador(a)')]]),...(COO.length?[[COO.length>1?'Coorientadores(as)':'Coorientador(a)',t(COO.join('; '),{size:20})]]:[]),
+    ['Período de realização',t(periodo,{size:20})],['Carga horária total',t(`${I.ch||'[___]'} horas`+(filled(I.jornada)?` (jornada de ${I.jornada} h/semana)`:''),{size:20})]];
+  const qrows=idRows.map(([a,c])=>[{content:a,opts:{bold:true}},{content:c}]);
+  if(!ks.length) qrows.push([{content:'Modalidade',opts:{bold:true}},{content:small('','modalidade')}]);
+  ks.forEach(k=>{
+    const m=S.mods[k];
+    qrows.push([{content:'Modalidade: '+nomeMod(k),opts:{head:true,span:2}}]);
+    if(multiOri()) qrows.push([{content:'Orientador(a)',opts:{bold:true}},{content:small((m.orientador||I.orientador||''),'orientador(a)')}]);
+    MODS[k].campos.forEach(c=>{ const val=c.type==='date'? fmtDate(m[c.k]) : m[c.k];
+      if(!c.req && !filled(val)) return;
+      const lab=c.k==='condicao'?'Participação do(a) estudante':c.k==='funcao'?'Função do(a) estudante':c.l;
+      qrows.push([{content:lab,opts:{bold:true}},{content:small(val,c.l.toLowerCase())}]); });
+    if(k==='E'){ const eq=(m.equipe||[]).filter(r=>filled(r.nome)); if(eq.length) qrows.push([{content:'Demais integrantes da equipe',opts:{bold:true}},{content:t(eq.map(r=>r.nome.trim()+(filled(r.matricula)?` (${r.matricula.trim()})`:'')+(filled(r.funcao)?` – ${r.funcao.trim()}`:'')).join('; '),{size:20})}]); }
+  });
+  T.push(quadro([3400,5671],null,qrows));
+  if(ks.length>1){
+    const soma=ks.reduce((a,k)=>a+(+S.mods[k].ch||0),0);
+    T.push(new Paragraph({children:[t('Composição da prática profissional combinada',{bold:true})],spacing:{before:240,after:60},keepNext:true}));
+    T.push(quadro([3200,2700,1871,1300],['Modalidade','Local / projeto','Período','Carga horária'],[
+      ...ks.map(k=>{const m=S.mods[k]; return [nomeMod(k),{content:small(m[MODS[k].principal],'local / projeto')},(m.inicio||m.fim)?`${fmtDate(m.inicio)} a ${fmtDate(m.fim)}`:{content:small('','período')},{content:small(m.ch?m.ch+' h':'','CH')}];}),
+      [{content:'Total',opts:{bold:true}},'','',{content:`${soma} h`,opts:{bold:true}}]]));
+  }
+
+  const margin={top:1701,left:1701,bottom:1134,right:1134};
+  const instr=[];
+  if(MM){
+    const li=x=>new Paragraph({children:[t('• '+x)],indent:{left:360,hanging:360},spacing:{line:L15,after:80},alignment:AlignmentType.JUSTIFIED});
+    instr.push(HC('ORIENTAÇÕES PARA O PREENCHIMENTO',false),
+      P([t('Este modelo de Relatório Final de Prática Profissional foi preparado pelo(a) seu(sua) orientador(a) para a sua prática '+(ks.length?`(${modsTxt})`:'profissional')+'. A identificação, a estrutura de seções e a formatação ABNT já estão prontas. Escreva nos trechos destacados em amarelo, seguindo os quadros azuis de ORIENTAÇÃO de cada seção.')]), ...blank(1));
+    if(filled(S.modelo.recado)) instr.push(P([t('Recado do(a) orientador(a)',{bold:true})],{indent:{firstLine:0}}), ...paras(S.modelo.recado), ...blank(1));
+    instr.push(P([t('Como preencher',{bold:true})],{indent:{firstLine:0}}),
+      li('Substitua as marcações em amarelo pelo seu texto e apague os quadros azuis de orientação.'),
+      li('Não altere a formatação: fonte Arial 12, espaçamento 1,5, margens, numeração das páginas e das seções já seguem a ABNT.'),
+      li('Para criar uma nova seção ou subseção, copie um título existente ou use os estilos Título 1, Título 2 e Título 3, para que ela entre no sumário.'),
+      li('Para inserir figuras, tabelas e quadros, use Referências > Inserir Legenda (rótulos Figura, Tabela ou Quadro): título acima e fonte abaixo.'),
+      li('Citações conforme a NBR 10520; referências conforme a NBR 6023.'),
+      li('No fim, atualize o sumário e as listas: clique com o botão direito sobre cada um > Atualizar campo > Atualizar o índice inteiro.'),
+      li('O termo de validação é preenchido e assinado pelo(a) orientador(a).'),
+      ...blank(1), P([t('Apague esta página antes de entregar.',{bold:true})],{indent:{firstLine:0}}));
+  }
+  return new Document({
+    creator: I.estudante||'Estudante IFRN', title: titulo||'Relatório de Prática Profissional',
+    features:{updateFields:true},
+    styles:{ default:{document:{run:{font:FONT,size:24}}},
+      paragraphStyles:[
+        {id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',quickFormat:true,run:{font:FONT,size:24,bold:true,allCaps:true,color:'000000'},paragraph:{outlineLevel:0}},
+        {id:'Heading2',name:'Heading 2',basedOn:'Normal',next:'Normal',quickFormat:true,run:{font:FONT,size:24,bold:false,allCaps:true,color:'000000'},paragraph:{outlineLevel:1}},
+        {id:'Heading3',name:'Heading 3',basedOn:'Normal',next:'Normal',quickFormat:true,run:{font:FONT,size:24,bold:true,color:'000000'},paragraph:{outlineLevel:2}}]},
+    sections:[
+      ...(MM? [{properties:{page:{margin}},footers:{default:vazio()},children:instr}] : []),
+      {properties:{page:{margin}},footers:{default:localAno()},children:capa},
+      {properties:{page:{margin,pageNumbers:{start:1}}},footers:{default:localAno()},children:rosto},
+      {properties:{page:{margin}},footers:{default:vazio()},children:pre},
+      {properties:{page:{margin}},footers:{default:vazio()},headers:{default:new Header({children:[new Paragraph({alignment:AlignmentType.RIGHT,children:[new TextRun({children:[PageNumber.CURRENT],font:FONT,size:20})]})]})},children:T},
+    ]});
+}
+
+/* ====================== EXEMPLO FICTÍCIO ====================== */
+const EXEMPLO={
+  ident:{estudante:'Ana Beatriz Lima (exemplo)',matricula:'20221011100000',campus:'Natal-Central',curso:'Edificações',cidade:'Natal',ano:String(new Date().getFullYear()),
+    titulo:'Estágio em gerenciamento de obras na Construtora Exemplo Ltda.',subtitulo:'',area:'gerenciamento de obras',orientador:'Carlos Eduardo Menezes (exemplo)',
+    inicio:'2026-03-02',fim:'2026-07-31',ch:'400',jornada:'20'},
+  mods:{A:{on:true,tipo:'Não obrigatório',concedente:'Construtora Exemplo Ltda., Natal/RN',supervisor:'Eng.ª Paula Freitas (exemplo), engenheira civil',registro:'Termo de Compromisso nº 000/2026',inicio:'',fim:'',ch:''}},
+  carac:{A:['A Construtora Exemplo Ltda. é uma empresa de pequeno porte do ramo da construção civil, com sede em Natal/RN. O estágio é obrigatório, conforme o PPC do curso.','Fundada em 2010, a empresa atua em obras residenciais multifamiliares de padrão médio na Grande Natal.','O estágio ocorreu no setor de execução de obras, com equipe de um engenheiro, dois mestres de obras e cerca de 40 operários.','A supervisão foi feita pela engenheira responsável pela obra, com reuniões semanais de planejamento.']},
+  introducao:'Este relatório apresenta as atividades desenvolvidas no estágio supervisionado realizado na Construtora Exemplo Ltda., entre março e julho de 2026, com carga horária de 400 horas.\nO objetivo geral foi acompanhar a execução de uma obra residencial multifamiliar, aplicando os conhecimentos de leitura de projetos, orçamento e controle tecnológico de materiais.',
+  plano:[{atividade:'Leitura e interpretação de projetos arquitetônicos e estruturais',situacao:'Realizada',ch:'80',obs:''},{atividade:'Acompanhamento da concretagem de lajes',situacao:'Realizada',ch:'120',obs:''},{atividade:'Levantamento de quantitativos',situacao:'Realizada parcialmente',ch:'60',obs:'Parte do levantamento foi feita pelo setor de orçamento.'}],
+  descricao:[{titulo:'Leitura de projetos',texto:'Durante as primeiras semanas, foram analisadas as pranchas do projeto arquitetônico e estrutural, com apoio da supervisora.'}],
+  teoria:[{disciplina:'Desenho Técnico e Arquitetônico',aplicacao:'Leitura de plantas, cortes e detalhes construtivos.'},{disciplina:'Materiais de Construção',aplicacao:'Recebimento do concreto usinado e moldagem de corpos de prova.'}],
+  desafios:'A principal dificuldade foi conciliar o horário do estágio com as aulas, resolvida com um cronograma combinado com a supervisora.\nO uso correto dos EPIs e a comunicação com a equipe de obra foram aprendizagens importantes.',
+  figs:{desc_0:[{titulo:'Leitura de projeto na obra',fonte:'Acervo próprio (2026)'}]},
+  palavras:'estágio; edificações; acompanhamento de obras',
+};
+
+/* ====================== INÍCIO ====================== */
+if(loadLocal()) $('#savedState').textContent='rascunho recuperado deste navegador';
+render();
 </script>
-</body>
-</html>
